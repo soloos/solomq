@@ -1,0 +1,5 @@
+
+bench-soloos-swal-libswal:
+	cd src/soloos/swal/libswal/ && go test -bench=. -benchmem 
+
+bench: bench-soloos-swal-libswal

@@ -1,0 +1,5 @@
+
+test-soloos-swal-libswal:
+	go test soloos/swal/libswal
+
+test: test-soloos-swal-libswal
