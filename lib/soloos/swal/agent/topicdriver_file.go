@@ -47,6 +47,20 @@ func (p *TopicDriver) OpenFile(topicID swalapitypes.TopicID, path string) (sdfsa
 	return fdID, err
 }
 
+func (p *TopicDriver) NetINodeBlockPlacementPolicySetTopicID(
+	pPolicy *sdfsapitypes.MemBlockPlacementPolicy,
+	topicID swalapitypes.TopicID,
+) {
+	*(*swalapitypes.TopicID)(unsafe.Pointer(&(pPolicy[sdfsapitypes.MemBlockPlacementPolicyBodyOff]))) =
+		swalapitypes.TopicID(topicID)
+}
+
+func (p *TopicDriver) NetINodeBlockPlacementPolicyGetTopicID(
+	pPolicy *sdfsapitypes.MemBlockPlacementPolicy,
+) swalapitypes.TopicID {
+	return (*(*swalapitypes.TopicID)(unsafe.Pointer(&(pPolicy[sdfsapitypes.MemBlockPlacementPolicyBodyOff]))))
+}
+
 func (p *TopicDriver) PrepareFsINodeMetaData(
 	pTopic *swalapitypes.Topic,
 	pFsINodeMeta *sdfsapitypes.FsINodeMeta,
@@ -62,9 +76,9 @@ func (p *TopicDriver) PrepareFsINodeMetaData(
 	}
 
 	policy.SetType(sdfsapitypes.BlockPlacementPolicySWAL)
-	p.FsINodeBlockPlacementPolicySetTopic(pTopic, &policy)
+	p.NetINodeBlockPlacementPolicySetTopicID(&policy, pTopic.ID)
 
-	err = p.swalAgent.posixFS.SetFsINodeBlockPlacement(pFsINodeMeta.Ino, policy)
+	err = p.swalAgent.posixFS.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)
 	if err != nil {
 		return err
 	}
@@ -103,18 +117,21 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic swalapitypes.
 		return err
 	}
 
-	for _, backend := range pNetBlock.StorDataBackends.Slice() {
-		log.Error(backend.Ptr().PeerIDStr())
-		log.Error(backend.Ptr().AddressStr())
+	pNetBlock.SyncDataBackends.Reset()
+	for i := 0; i < pNetBlock.StorDataBackends.Len; i++ {
+		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.swalAgent.peer.ID {
+			pNetBlock.SyncDataBackends.Append(pNetBlock.StorDataBackends.Arr[i], 0)
+		} else {
+			pNetBlock.SyncDataBackends.Append(pTopic.Meta.SWALMemberGroup.Arr[i].PeerID, 1)
+			pNetBlock.SyncDataBackends.Append(pNetBlock.StorDataBackends.Arr[i], 0)
+		}
 	}
 
-	log.Error("\n\nSyncDataBackends", pNetBlock.SyncDataPrimaryBackendTransferCount)
+	log.Error("\n\nSyncDataBackends")
 	for _, backend := range pNetBlock.SyncDataBackends.Slice() {
-		log.Error(backend.Ptr().PeerIDStr())
-		log.Error(backend.Ptr().AddressStr())
+		log.Error(backend.PeerID.Str(), backend.TransferCount)
 	}
-	log.Error(pNetBlock.LocalDataBackend)
-	panic("fuck")
+	log.Error(pNetBlock.IsLocalDataBackendExists)
 
 	return nil
 }
@@ -128,34 +145,23 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleFollower(uTopic swalapitype
 func (p *TopicDriver) PrepareNetBlockMetaData(topicID swalapitypes.TopicID,
 	uNetBlock sdfsapitypes.NetBlockUintptr,
 	uNetINode sdfsapitypes.NetINodeUintptr, netblockIndex int32) error {
-	var uTopic, err = p.FsINodeBlockPlacementPolicyGetTopic(&uNetINode.Ptr().MemBlockPlacementPolicy)
+	var uTopic, err = p.GetTopicByID(topicID)
+	defer p.ReleaseTopic(uTopic)
 	if err != nil {
 		return err
 	}
 
+	p.NetINodeBlockPlacementPolicySetTopicID(&uNetINode.Ptr().MemBlockPlacementPolicy, topicID)
+
 	log.Error(uTopic.Ptr().Meta.TopicID)
-	log.Error(uTopic.Ptr().Meta.TopicName.Str())
 	switch p.computeTopicRole(uTopic) {
 	case swalapitypes.SWALMemberRoleLeader:
+		log.Error(uTopic.Ptr().Meta.TopicName.Str(), "prepareNetBlockMetaDataWithRoleLeader")
 		err = p.prepareNetBlockMetaDataWithRoleLeader(uTopic, uNetBlock, uNetINode, netblockIndex)
 	case swalapitypes.SWALMemberRoleFollower:
+		log.Error(uTopic.Ptr().Meta.TopicName.Str(), "prepareNetBlockMetaDataWithRoleFollower")
 		err = p.prepareNetBlockMetaDataWithRoleFollower(uTopic, uNetBlock, uNetINode, netblockIndex)
 	}
 
 	return nil
-}
-
-func (p *TopicDriver) FsINodeBlockPlacementPolicySetTopic(
-	pTopic *swalapitypes.Topic,
-	pPolicy *sdfsapitypes.MemBlockPlacementPolicy,
-) {
-	*(*swalapitypes.TopicID)(unsafe.Pointer(&(pPolicy[sdfsapitypes.MemBlockPlacementPolicyHeaderBytesNum]))) =
-		swalapitypes.TopicID(pTopic.Meta.TopicID)
-}
-
-func (p *TopicDriver) FsINodeBlockPlacementPolicyGetTopic(
-	pPolicy *sdfsapitypes.MemBlockPlacementPolicy,
-) (swalapitypes.TopicUintptr, error) {
-	var topicID = (*(*swalapitypes.TopicID)(unsafe.Pointer(&(pPolicy[sdfsapitypes.MemBlockPlacementPolicyHeaderBytesNum]))))
-	return p.GetTopicByID(topicID)
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"soloos/util/offheap"
+	"soloos/sdbone/offheap"
 )
 
 type Env struct {
@@ -11,7 +11,6 @@ type Env struct {
 
 func (p *Env) Init(options Options) {
 	p.options = options
-	p.offheapDriver = &offheap.DefaultOffheapDriver
 }
 
 func (p *Env) Start() {

@@ -139,7 +139,7 @@ func (p *TopicDriver) ReleaseTopic(uTopic swalapitypes.TopicUintptr) {
 
 func (p *TopicDriver) computeTopicRole(uTopic swalapitypes.TopicUintptr) int {
 	for _, backend := range uTopic.Ptr().Meta.SWALMemberGroup.Slice() {
-		if p.swalAgent.peerID == backend.PeerID {
+		if p.swalAgent.peer.ID == backend.PeerID {
 			return backend.Role
 		}
 	}

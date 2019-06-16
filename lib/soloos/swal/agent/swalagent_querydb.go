@@ -16,7 +16,7 @@ func (p *SWALAgent) RegisterInDB() error {
 	}
 
 	err = sess.ReplaceInto("b_swal_agent").
-		PrimaryColumns("peer_id").PrimaryValues(string(p.peerID[:])).
+		PrimaryColumns("peer_id").PrimaryValues(string(p.peer.ID[:])).
 		Columns("serve_addr").Values(p.srpcServer.srpcServerListenAddr).
 		Exec()
 	if err != nil {

@@ -30,6 +30,7 @@ func (p *Client) PrepareNetBlockMetaData(uNetBlock sdfsapitypes.NetBlockUintptr,
 }
 
 func (p *Client) UploadMemBlockWithSWAL(uJob sdfsapitypes.UploadMemBlockJobUintptr,
-	uploadPeerIndex int, transferPeersCount int) error {
-	return nil
+	uploadPeerIndex int) error {
+	return p.clientDriver.SWALAgent.UploadMemBlockWithSWAL(uJob,
+		uploadPeerIndex)
 }

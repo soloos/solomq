@@ -2,17 +2,19 @@ package agent
 
 import (
 	"soloos/common/fsapi"
+	"soloos/common/log"
 	"soloos/common/sdbapi"
 	"soloos/common/sdfsapi"
 	"soloos/common/snettypes"
 	"soloos/common/soloosbase"
 	"soloos/common/swalapi"
+	"soloos/common/swalapitypes"
 	"soloos/common/util"
 )
 
 type SWALAgent struct {
 	*soloosbase.SoloOSEnv
-	peerID     snettypes.PeerID
+	peer       snettypes.Peer
 	dbConn     sdbapi.Connection
 	srpcServer SWALAgentSRPCServer
 	uploader   swalAgentUploader
@@ -33,7 +35,9 @@ func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	var err error
 
 	p.SoloOSEnv = soloOSEnv
-	p.peerID = peerID
+	p.peer.ID = peerID
+	p.peer.SetAddress(serveAddr)
+	p.peer.ServiceProtocol = swalapitypes.DefaultSWALRPCProtocol
 
 	err = p.dbConn.Init(dbDriver, dsn)
 	if err != nil {
@@ -60,6 +64,12 @@ func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
 		return err
 	}
 
+	err = p.SoloOSEnv.SNetDriver.RegisterPeer(p.peer)
+	log.Error("fuck register", p.peer.PeerIDStr(), p.peer.AddressStr())
+	if err != nil {
+		return err
+	}
+
 	err = p.uploader.Init(p)
 	if err != nil {
 		return err
@@ -69,7 +79,7 @@ func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
 }
 
 func (p *SWALAgent) GetPeerID() snettypes.PeerID {
-	return p.peerID
+	return p.peer.ID
 }
 
 func (p *SWALAgent) Serve() error {
