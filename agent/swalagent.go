@@ -1,30 +1,57 @@
 package agent
 
 import (
+	"fmt"
 	"soloos/common/fsapi"
-	"soloos/common/log"
 	"soloos/common/sdbapi"
 	"soloos/common/sdfsapi"
+	"soloos/common/snet"
 	"soloos/common/snettypes"
 	"soloos/common/soloosbase"
 	"soloos/common/swalapi"
 	"soloos/common/swalapitypes"
-	"soloos/common/util"
 )
 
 type SWALAgent struct {
 	*soloosbase.SoloOSEnv
-	peer       snettypes.Peer
-	dbConn     sdbapi.Connection
-	srpcServer SWALAgentSRPCServer
-	uploader   swalAgentUploader
+	peer   snettypes.Peer
+	dbConn sdbapi.Connection
+
+	TopicDriver
+	swalAgentClient swalapi.SWALAgentClient
 
 	sdfsClient sdfsapi.Client
 	posixFS    fsapi.PosixFS
 
-	TopicDriver
+	localFsSNetPeer snettypes.Peer
 
-	SWALAgentClient swalapi.SWALAgentClient
+	srpcServer SWALAgentSRPCServer
+}
+
+func (p *SWALAgent) initLocalFs() error {
+	var err error
+	p.localFsSNetPeer.ID = snet.MakeSysPeerID(fmt.Sprintf("SWALAgent_LOCAL_FS"))
+	p.localFsSNetPeer.SetAddress("LocalFs")
+	p.localFsSNetPeer.ServiceProtocol = snettypes.ProtocolDisk
+	err = p.SNetDriver.RegisterPeer(p.localFsSNetPeer)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *SWALAgent) initSNetPeer(peerID snettypes.PeerID, serveAddr string) error {
+	var err error
+	p.peer.ID = peerID
+	p.peer.SetAddress(serveAddr)
+	p.peer.ServiceProtocol = swalapitypes.DefaultSWALRPCProtocol
+
+	err = p.SoloOSEnv.SNetDriver.RegisterPeer(p.peer)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
@@ -35,9 +62,11 @@ func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	var err error
 
 	p.SoloOSEnv = soloOSEnv
-	p.peer.ID = peerID
-	p.peer.SetAddress(serveAddr)
-	p.peer.ServiceProtocol = swalapitypes.DefaultSWALRPCProtocol
+
+	err = p.initSNetPeer(peerID, serveAddr)
+	if err != nil {
+		return err
+	}
 
 	err = p.dbConn.Init(dbDriver, dsn)
 	if err != nil {
@@ -45,6 +74,11 @@ func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	}
 
 	err = p.installSchema(dbDriver)
+	if err != nil {
+		return err
+	}
+
+	err = p.swalAgentClient.Init(p.SoloOSEnv)
 	if err != nil {
 		return err
 	}
@@ -59,18 +93,12 @@ func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
 		return err
 	}
 
+	err = p.initLocalFs()
+	if err != nil {
+		return err
+	}
+
 	err = p.RegisterInDB()
-	if err != nil {
-		return err
-	}
-
-	err = p.SoloOSEnv.SNetDriver.RegisterPeer(p.peer)
-	log.Error("fuck register", p.peer.PeerIDStr(), p.peer.AddressStr())
-	if err != nil {
-		return err
-	}
-
-	err = p.uploader.Init(p)
 	if err != nil {
 		return err
 	}
@@ -85,20 +113,12 @@ func (p *SWALAgent) GetPeerID() snettypes.PeerID {
 func (p *SWALAgent) Serve() error {
 	var err error
 	err = p.srpcServer.Serve()
-	go func() {
-		util.AssertErrIsNil(p.uploader.Serve())
-	}()
 	return err
 }
 
 func (p *SWALAgent) Close() error {
 	var err error
 	err = p.srpcServer.Close()
-	if err != nil {
-		return err
-	}
-
-	err = p.uploader.Close()
 	if err != nil {
 		return err
 	}

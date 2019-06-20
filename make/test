@@ -1,5 +1,5 @@
 
-test-soloos-swal-libswal:
-	go test soloos/swal/libswal
+test-swalcli:
+	go test .//swalcli
 
-test: test-soloos-swal-libswal
+test: test-swalcli
