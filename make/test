@@ -1,5 +1,5 @@
 
-test-swalcli:
-	go test .//swalcli
+test-swalsdk:
+	go test .//swalsdk
 
-test: test-swalcli
+test: test-swalsdk

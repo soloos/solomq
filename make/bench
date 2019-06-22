@@ -1,5 +1,5 @@
 
-bench-swalcli:
-	cd src/.//swalcli/ && go test -bench=. -benchmem 
+bench-swalsdk:
+	cd src/.//swalsdk/ && go test -bench=. -benchmem 
 
-bench: bench-swalcli
+bench: bench-swalsdk

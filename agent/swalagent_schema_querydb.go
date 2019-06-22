@@ -33,28 +33,28 @@ func (p *SWALAgent) prepareSchemaSqls(dbDriver string) []string {
 	switch dbDriver {
 	case "mysql":
 		sqls = append(sqls, `
-	create table if not exists b_swal_topic (
-		topic_id int auto_increment,
-		topic_name char(64),
-		primary key(topic_id)
-	);
-	`)
+		create table if not exists b_swal_topic (
+			topic_id int auto_increment,
+			topic_name char(64),
+			primary key(topic_id)
+		);
+		`)
 	case "sqlite":
 		sqls = append(sqls, `
-	create table if not exists b_swal_topic (
-		topic_id int autoincrement,
-		topic_name char(64),
-		primary key(topic_id)
-	);
-	`)
+		create table if not exists b_swal_topic (
+			topic_id int autoincrement,
+			topic_name char(64),
+			primary key(topic_id)
+		);
+		`)
 	case "postgres":
 		sqls = append(sqls, `
-	create table if not exists b_swal_topic (
-		topic_id serial,
-		topic_name char(64),
-		primary key(topic_id)
-	);
-	`)
+		create table if not exists b_swal_topic (
+			topic_id serial,
+			topic_name char(64),
+			primary key(topic_id)
+		);
+		`)
 
 	}
 

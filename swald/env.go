@@ -9,9 +9,11 @@ type Env struct {
 	offheapDriver *offheap.OffheapDriver
 }
 
-func (p *Env) Init(options Options) {
+func (p *Env) Init(options Options) error {
 	p.options = options
+	return nil
 }
 
-func (p *Env) Start() {
+func (p *Env) Serve() error {
+	return nil
 }

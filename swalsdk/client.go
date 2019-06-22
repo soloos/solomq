@@ -1,4 +1,4 @@
-package swalcli
+package swalsdk
 
 import (
 	"soloos/common/sdfsapi"
