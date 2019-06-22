@@ -34,7 +34,7 @@ func (p *TopicDriver) OpenFile(topicID swalapitypes.TopicID, path string) (sdfsa
 		return 0, err
 	}
 
-	err = p.PrepareFsINodeMetaData(uTopic, &fsINodeMeta)
+	err = p.PrepareTopicMetaData(uTopic, &fsINodeMeta)
 	if err != nil {
 		return 0, err
 	}
@@ -44,7 +44,7 @@ func (p *TopicDriver) OpenFile(topicID swalapitypes.TopicID, path string) (sdfsa
 	return fdID, err
 }
 
-func (p *TopicDriver) PrepareFsINodeMetaData(
+func (p *TopicDriver) PrepareTopicMetaData(
 	uTopic swalapitypes.TopicUintptr,
 	pFsINodeMeta *sdfsapitypes.FsINodeMeta,
 ) error {
@@ -69,7 +69,7 @@ func (p *TopicDriver) PrepareFsINodeMetaData(
 	for i, _ = range pTopic.Meta.SWALMemberGroup.Slice() {
 		go func(jobRet chan error, index int,
 			peerID snettypes.PeerID, uTopic swalapitypes.TopicUintptr, fsINodeID sdfsapitypes.FsINodeID) {
-			jobRet <- p.swalAgent.swalAgentClient.PrepareTopicFsINodeMetaData(
+			jobRet <- p.swalAgent.swalAgentClient.PrepareTopicMetaData(
 				uTopic.Ptr().Meta.SWALMemberGroup.Arr[index].PeerID,
 				uTopic, fsINodeID)
 		}(jobRet, i, pTopic.Meta.SWALMemberGroup.Arr[i].PeerID, uTopic, pFsINodeMeta.Ino)
