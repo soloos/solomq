@@ -5,7 +5,7 @@ go 1.12
 replace (
 	soloos/common v0.0.0 => /soloos/common
 	soloos/sdbone v0.0.0 => /soloos/sdbone
-	soloos/silicon v0.0.0 => /soloos/silicon
+	soloos/soloboat v0.0.0 => /soloos/soloboat
 )
 
 require (
@@ -14,5 +14,5 @@ require (
 	github.com/mattn/go-sqlite3 v1.10.0
 	soloos/common v0.0.0
 	soloos/sdbone v0.0.0
-	soloos/silicon v0.0.0 // indirect
+	soloos/soloboat v0.0.0 // indirect
 )

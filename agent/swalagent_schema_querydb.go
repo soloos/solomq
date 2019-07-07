@@ -25,7 +25,7 @@ func (p *SWALAgent) prepareSchemaSqls(dbDriver string) []string {
 	sqls = append(sqls, `
 	create table if not exists b_swal_agent (
 		peer_id char(64),
-		serve_addr varchar(512),
+		desc varchar(512),
 		primary key(peer_id)
 	);
 	`)
