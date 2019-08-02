@@ -1,4 +1,4 @@
-package types
+package swaltypes
 
 import (
 	"soloos/common/sdbapitypes"

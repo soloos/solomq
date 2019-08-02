@@ -8,7 +8,7 @@ import (
 
 func TestClient(t *testing.T) {
 	var soloOSEnv soloosbase.SoloOSEnv
-	util.AssertErrIsNil(soloOSEnv.Init())
+	util.AssertErrIsNil(soloOSEnv.InitWithSNet(""))
 
 	// var swalAgentPeerIDStr = "00"
 	// var swalAgentServeAddr = "127.0.0.1:9211"
