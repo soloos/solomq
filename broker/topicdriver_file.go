@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"path/filepath"
@@ -25,9 +25,9 @@ func (p *TopicDriver) OpenFile(topicID swalapitypes.TopicID, path string) (sdfsa
 	}
 
 	dirPath = filepath.Dir(path)
-	p.swalAgent.posixFS.SimpleMkdirAll(0777, dirPath, 0, 0)
+	p.broker.posixFS.SimpleMkdirAll(0777, dirPath, 0, 0)
 
-	fsINodeMeta, err = p.swalAgent.posixFS.SimpleOpenFile(path,
+	fsINodeMeta, err = p.broker.posixFS.SimpleOpenFile(path,
 		p.defaultNetBlockCap, p.defaultNetBlockCap)
 	if err != nil {
 		log.Error("open file failed", path, err)
@@ -39,7 +39,7 @@ func (p *TopicDriver) OpenFile(topicID swalapitypes.TopicID, path string) (sdfsa
 		return 0, err
 	}
 
-	fdID = p.swalAgent.posixFS.FdTableAllocFd(fsINodeMeta.Ino)
+	fdID = p.broker.posixFS.FdTableAllocFd(fsINodeMeta.Ino)
 
 	return fdID, err
 }
@@ -59,7 +59,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 
 	jobNum = 0
 	for i, _ = range pTopic.Meta.SWALMemberGroup.Slice() {
-		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.swalAgent.peer.ID {
+		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.broker.peer.ID {
 			continue
 		}
 		jobNum++
@@ -69,7 +69,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 	for i, _ = range pTopic.Meta.SWALMemberGroup.Slice() {
 		go func(jobRet chan error, index int,
 			peerID snettypes.PeerID, uTopic swalapitypes.TopicUintptr, fsINodeID sdfsapitypes.FsINodeID) {
-			jobRet <- p.swalAgent.swalAgentClient.PrepareTopicMetaData(
+			jobRet <- p.broker.brokerClient.PrepareTopicMetaData(
 				uTopic.Ptr().Meta.SWALMemberGroup.Arr[index].PeerID,
 				uTopic, fsINodeID)
 		}(jobRet, i, pTopic.Meta.SWALMemberGroup.Arr[i].PeerID, uTopic, pFsINodeMeta.Ino)
@@ -91,7 +91,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 	policy.SetType(sdfsapitypes.BlockPlacementPolicySWAL)
 	NetINodeBlockPlacementPolicySetTopicID(&policy, pTopic.ID)
 
-	err = p.swalAgent.posixFS.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)
+	err = p.broker.posixFS.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)
 	if err != nil {
 		return err
 	}

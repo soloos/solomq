@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"fmt"
@@ -12,25 +12,25 @@ import (
 	"soloos/common/swalapitypes"
 )
 
-type SWALAgent struct {
+type Broker struct {
 	*soloosbase.SoloOSEnv
 	peer   snettypes.Peer
 	dbConn sdbapi.Connection
 
 	TopicDriver
-	swalAgentClient swalapi.SWALAgentClient
+	brokerClient swalapi.BrokerClient
 
 	sdfsClient sdfsapi.Client
 	posixFS    fsapi.PosixFS
 
 	localFsSNetPeer snettypes.Peer
 
-	srpcServer SWALAgentSRPCServer
+	srpcServer BrokerSRPCServer
 }
 
-func (p *SWALAgent) initLocalFs() error {
+func (p *Broker) initLocalFs() error {
 	var err error
-	p.localFsSNetPeer.ID = snet.MakeSysPeerID(fmt.Sprintf("SWALAgent_LOCAL_FS"))
+	p.localFsSNetPeer.ID = snet.MakeSysPeerID(fmt.Sprintf("Broker_LOCAL_FS"))
 	p.localFsSNetPeer.SetAddress("LocalFs")
 	p.localFsSNetPeer.ServiceProtocol = snettypes.ProtocolDisk
 	err = p.SNetDriver.RegisterPeer(p.localFsSNetPeer)
@@ -40,7 +40,7 @@ func (p *SWALAgent) initLocalFs() error {
 	return nil
 }
 
-func (p *SWALAgent) initSNetPeer(peerID snettypes.PeerID, serveAddr string) error {
+func (p *Broker) initSNetPeer(peerID snettypes.PeerID, serveAddr string) error {
 	var err error
 	p.peer.ID = peerID
 	p.peer.SetAddress(serveAddr)
@@ -54,7 +54,7 @@ func (p *SWALAgent) initSNetPeer(peerID snettypes.PeerID, serveAddr string) erro
 	return nil
 }
 
-func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
+func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	peerID snettypes.PeerID, serveAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
@@ -78,7 +78,7 @@ func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
 		return err
 	}
 
-	err = p.swalAgentClient.Init(p.SoloOSEnv)
+	err = p.brokerClient.Init(p.SoloOSEnv)
 	if err != nil {
 		return err
 	}
@@ -106,17 +106,17 @@ func (p *SWALAgent) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	return nil
 }
 
-func (p *SWALAgent) GetPeerID() snettypes.PeerID {
+func (p *Broker) GetPeerID() snettypes.PeerID {
 	return p.peer.ID
 }
 
-func (p *SWALAgent) Serve() error {
+func (p *Broker) Serve() error {
 	var err error
 	err = p.srpcServer.Serve()
 	return err
 }
 
-func (p *SWALAgent) Close() error {
+func (p *Broker) Close() error {
 	var err error
 	err = p.srpcServer.Close()
 	if err != nil {

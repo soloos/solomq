@@ -1,8 +1,8 @@
-package agent
+package broker
 
 import "soloos/common/log"
 
-func (p *SWALAgent) installSchema(dbDriver string) error {
+func (p *Broker) installSchema(dbDriver string) error {
 	var (
 		sqls []string
 		err  error
@@ -19,11 +19,11 @@ func (p *SWALAgent) installSchema(dbDriver string) error {
 	return nil
 }
 
-func (p *SWALAgent) prepareSchemaSqls(dbDriver string) []string {
+func (p *Broker) prepareSchemaSqls(dbDriver string) []string {
 	var sqls []string
 
 	sqls = append(sqls, `
-	create table if not exists b_swal_agent (
+	create table if not exists b_swal_broker (
 		peer_id char(64),
 		desc varchar(512),
 		primary key(peer_id)

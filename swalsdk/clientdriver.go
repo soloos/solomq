@@ -5,18 +5,18 @@ import (
 	"soloos/common/soloosbase"
 	"soloos/common/swalapi"
 	"soloos/common/swalapitypes"
-	"soloos/swal/agent"
+	"soloos/swal/broker"
 )
 
 type ClientDriver struct {
 	*soloosbase.SoloOSEnv
-	SWALAgent agent.SWALAgent
+	broker broker.Broker
 }
 
 var _ = swalapi.ClientDriver(&ClientDriver{})
 
 func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
-	swalAgentPeerIDStr string, swalAgentServeAddr string,
+	brokerPeerIDStr string, brokerServeAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {
@@ -24,10 +24,10 @@ func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
 
 	p.SoloOSEnv = soloOSEnv
 
-	var swalAgentPeerID snettypes.PeerID
-	copy(swalAgentPeerID[:], []byte(swalAgentPeerIDStr))
-	err = p.SWALAgent.Init(p.SoloOSEnv,
-		swalAgentPeerID, swalAgentServeAddr,
+	var brokerPeerID snettypes.PeerID
+	copy(brokerPeerID[:], []byte(brokerPeerIDStr))
+	err = p.broker.Init(p.SoloOSEnv,
+		brokerPeerID, brokerServeAddr,
 		dbDriver, dsn,
 		defaultNetBlockCap, defaultMemBlockCap,
 	)
@@ -53,9 +53,9 @@ func (p *ClientDriver) InitClient(itClient swalapi.Client,
 }
 
 func (p *ClientDriver) Serve() error {
-	return p.SWALAgent.Serve()
+	return p.broker.Serve()
 }
 
 func (p *ClientDriver) Close() error {
-	return p.SWALAgent.Close()
+	return p.broker.Close()
 }

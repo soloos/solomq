@@ -1,10 +1,10 @@
-package agent
+package broker
 
 import (
 	"soloos/common/sdbapi"
 )
 
-func (p *SWALAgent) RegisterInDB() error {
+func (p *Broker) RegisterInDB() error {
 	var (
 		sess sdbapi.Session
 		err  error
@@ -15,7 +15,7 @@ func (p *SWALAgent) RegisterInDB() error {
 		return err
 	}
 
-	err = sess.ReplaceInto("b_swal_agent").
+	err = sess.ReplaceInto("b_swal_broker").
 		PrimaryColumns("peer_id").PrimaryValues(string(p.peer.ID[:])).
 		Columns("desc").Values(p.srpcServer.srpcServerListenAddr).
 		Exec()

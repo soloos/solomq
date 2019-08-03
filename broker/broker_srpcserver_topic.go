@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"soloos/common/sdfsapi"
@@ -8,7 +8,7 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-func (p *SWALAgentSRPCServer) ctrTopicPrepare(serviceReq *snettypes.NetQuery) error {
+func (p *BrokerSRPCServer) ctrTopicPrepare(serviceReq *snettypes.NetQuery) error {
 	var (
 		reqParamData = make([]byte, serviceReq.ParamSize)
 		reqParam     swalprotocol.TopicPrepareRequest

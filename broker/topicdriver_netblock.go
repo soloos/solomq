@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"soloos/common/sdfsapitypes"
@@ -34,7 +34,7 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic swalapitypes.
 
 	for _, swalMember := range pTopic.Meta.SWALMemberGroup.Slice() {
 		go func(peerID snettypes.PeerID, uTopic swalapitypes.TopicUintptr, queryNetRetArr chan error) {
-			queryNetRetArr <- p.swalAgent.swalAgentClient.PrepareTopicNetBlockMetaData(peerID,
+			queryNetRetArr <- p.broker.brokerClient.PrepareTopicNetBlockMetaData(peerID,
 				uTopic, uNetBlock, uNetINode, netblockIndex)
 		}(swalMember.PeerID, uTopic, queryNetRetArr)
 	}
@@ -54,7 +54,7 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic swalapitypes.
 
 	pNetBlock.SyncDataBackends.Reset()
 	for i := 0; i < pNetBlock.StorDataBackends.Len; i++ {
-		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.swalAgent.peer.ID {
+		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.broker.peer.ID {
 			pNetBlock.SyncDataBackends.Append(pNetBlock.StorDataBackends.Arr[i], 0)
 		} else {
 			pNetBlock.SyncDataBackends.Append(pTopic.Meta.SWALMemberGroup.Arr[i].PeerID, 1)

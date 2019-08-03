@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"soloos/common/sdbapitypes"
@@ -8,7 +8,7 @@ import (
 )
 
 type TopicDriver struct {
-	swalAgent *SWALAgent
+	broker *Broker
 
 	topicsByID   offheap.LKVTableWithInt64
 	topicsByName sync.Map
@@ -17,14 +17,14 @@ type TopicDriver struct {
 	defaultMemBlockCap int
 }
 
-func (p *TopicDriver) Init(swalAgent *SWALAgent,
+func (p *TopicDriver) Init(broker *Broker,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {
 	var err error
 
-	p.swalAgent = swalAgent
+	p.broker = broker
 
-	err = p.topicsByID.Init("SWALAgentTopic",
+	err = p.topicsByID.Init("BrokerTopic",
 		int(swalapitypes.TopicStructSize), -1, offheap.DefaultKVTableSharedCount,
 		p.topicsByIDInvokeBeforeReleaseObjectFunc)
 	if err != nil {
@@ -139,7 +139,7 @@ func (p *TopicDriver) ReleaseTopic(uTopic swalapitypes.TopicUintptr) {
 
 func (p *TopicDriver) computeTopicRole(uTopic swalapitypes.TopicUintptr) int {
 	for _, backend := range uTopic.Ptr().Meta.SWALMemberGroup.Slice() {
-		if p.swalAgent.peer.ID == backend.PeerID {
+		if p.broker.peer.ID == backend.PeerID {
 			return backend.Role
 		}
 	}

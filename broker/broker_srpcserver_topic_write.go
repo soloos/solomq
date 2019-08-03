@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"soloos/common/sdbapitypes"
@@ -10,7 +10,7 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-func (p *SWALAgentSRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
+func (p *BrokerSRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	var (
 		reqParamData     = make([]byte, serviceReq.ParamSize)
 		reqParam         swalprotocol.TopicPWriteRequest
@@ -41,8 +41,8 @@ func (p *SWALAgentSRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) err
 	)
 	copy(netINodeID[:], reqParam.NetINodeID())
 
-	uNetINode, err = p.swalAgent.posixFS.GetNetINode(netINodeID)
-	defer p.swalAgent.posixFS.ReleaseNetINode(uNetINode)
+	uNetINode, err = p.broker.posixFS.GetNetINode(netINodeID)
+	defer p.broker.posixFS.ReleaseNetINode(uNetINode)
 	if err != nil {
 		if err == sdfsapitypes.ErrObjectNotExists {
 			sdfsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_404)
@@ -55,7 +55,7 @@ func (p *SWALAgentSRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) err
 
 	// TODO no need prepare syncDataBackends every pwrite
 	syncDataBackends.Reset()
-	syncDataBackends.Append(p.swalAgent.localFsSNetPeer.ID)
+	syncDataBackends.Append(p.broker.localFsSNetPeer.ID)
 	for i = 0; i < reqParam.TransferBackendsLength(); i++ {
 		copy(peerID[:], reqParam.TransferBackends(i))
 		syncDataBackends.Append(peerID)
@@ -65,20 +65,20 @@ func (p *SWALAgentSRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) err
 	firstNetBlockIndex = int32(reqParam.Offset() / uint64(uNetINode.Ptr().NetBlockCap))
 	lastNetBlockIndex = int32((reqParam.Offset() + uint64(reqParam.Length())) / uint64(uNetINode.Ptr().NetBlockCap))
 	for netBlockIndex = firstNetBlockIndex; netBlockIndex <= lastNetBlockIndex; netBlockIndex++ {
-		uNetBlock, err = p.swalAgent.posixFS.MustGetNetBlock(uNetINode, netBlockIndex)
-		defer p.swalAgent.posixFS.ReleaseNetBlock(uNetBlock)
+		uNetBlock, err = p.broker.posixFS.MustGetNetBlock(uNetINode, netBlockIndex)
+		defer p.broker.posixFS.ReleaseNetBlock(uNetBlock)
 		if err != nil {
 			sdfsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_502)
 			goto SERVICE_DONE
 		}
 
 		if uNetBlock.Ptr().IsSyncDataBackendsInited.Load() == sdbapitypes.MetaDataStateUninited {
-			p.swalAgent.PrepareNetBlockSyncDataBackends(uNetBlock, syncDataBackends)
+			p.broker.PrepareNetBlockSyncDataBackends(uNetBlock, syncDataBackends)
 		}
 	}
 
 	// request file data
-	err = p.swalAgent.posixFS.NetINodePWriteWithNetQuery(uNetINode, serviceReq,
+	err = p.broker.posixFS.NetINodePWriteWithNetQuery(uNetINode, serviceReq,
 		int(reqParam.Length()), reqParam.Offset())
 	if err != nil {
 		return err

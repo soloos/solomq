@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"soloos/common/log"
@@ -6,15 +6,15 @@ import (
 	"soloos/common/snet"
 )
 
-type SWALAgentSRPCServer struct {
-	swalAgent            *SWALAgent
+type BrokerSRPCServer struct {
+	broker            *Broker
 	srpcServerListenAddr string
 	srpcServer           snet.SRPCServer
 }
 
-func (p *SWALAgentSRPCServer) Init(swalAgent *SWALAgent, srpcServerListenAddr string) error {
+func (p *BrokerSRPCServer) Init(broker *Broker, srpcServerListenAddr string) error {
 	var err error
-	p.swalAgent = swalAgent
+	p.broker = broker
 	p.srpcServerListenAddr = srpcServerListenAddr
 	err = p.srpcServer.Init(sdfsapitypes.DefaultSDFSRPCNetwork, p.srpcServerListenAddr)
 	if err != nil {
@@ -27,16 +27,16 @@ func (p *SWALAgentSRPCServer) Init(swalAgent *SWALAgent, srpcServerListenAddr st
 	return nil
 }
 
-func (p *SWALAgentSRPCServer) Serve() error {
+func (p *BrokerSRPCServer) Serve() error {
 	var err error
-	log.Info("swalagent srpcserver serve at:", p.srpcServerListenAddr)
+	log.Info("broker srpcserver serve at:", p.srpcServerListenAddr)
 	err = p.srpcServer.Serve()
 	return err
 }
 
-func (p *SWALAgentSRPCServer) Close() error {
+func (p *BrokerSRPCServer) Close() error {
 	var err error
-	log.Info("swalagent srpcserver close at:", p.srpcServerListenAddr)
+	log.Info("broker srpcserver close at:", p.srpcServerListenAddr)
 	err = p.srpcServer.Close()
 	return err
 }

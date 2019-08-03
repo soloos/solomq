@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"soloos/common/sdfsapitypes"
@@ -14,7 +14,7 @@ func (p *TopicDriver) UploadMemBlockWithSWAL(uJob sdfsapitypes.UploadMemBlockJob
 		return err
 	}
 
-	return p.swalAgent.swalAgentClient.UploadMemBlockWithSWAL(uTopic, uJob, uploadPeerIndex)
+	return p.broker.brokerClient.UploadMemBlockWithSWAL(uTopic, uJob, uploadPeerIndex)
 }
 
 func (p *TopicDriver) UploadMemBlockWithDisk(uJob sdfsapitypes.UploadMemBlockJobUintptr,

@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"database/sql"
@@ -15,7 +15,7 @@ func (p *TopicDriver) InsertTopicInDB(pTopicMeta *swalapitypes.TopicMeta) error 
 		err  error
 	)
 
-	err = p.swalAgent.dbConn.InitSessionWithTx(&sess, &tx)
+	err = p.broker.dbConn.InitSessionWithTx(&sess, &tx)
 	if err != nil {
 		goto QUERY_DONE
 	}
@@ -68,7 +68,7 @@ func (p *TopicDriver) FetchTopicByNameFromDB(topicName string, pTopicMeta *swala
 		err     error
 	)
 
-	err = p.swalAgent.dbConn.InitSession(&sess)
+	err = p.broker.dbConn.InitSession(&sess)
 	if err != nil {
 		goto QUERY_DONE
 	}
@@ -111,7 +111,7 @@ func (p *TopicDriver) FetchTopicByIDFromDB(topicID swalapitypes.TopicID, pTopicM
 		err       error
 	)
 
-	err = p.swalAgent.dbConn.InitSession(&sess)
+	err = p.broker.dbConn.InitSession(&sess)
 	if err != nil {
 		goto QUERY_DONE
 	}

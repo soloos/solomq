@@ -1,4 +1,4 @@
-package agent
+package broker
 
 import (
 	"soloos/common/sdbapitypes"
@@ -6,7 +6,7 @@ import (
 	"soloos/common/snettypes"
 )
 
-func (p *SWALAgent) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock sdfsapitypes.NetBlockUintptr,
+func (p *Broker) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock sdfsapitypes.NetBlockUintptr,
 	backends snettypes.PeerGroup,
 ) error {
 	var (
@@ -31,7 +31,7 @@ PREPARE_DONE:
 	return err
 }
 
-func (p *SWALAgent) PrepareNetBlockSyncDataBackends(uNetBlock sdfsapitypes.NetBlockUintptr,
+func (p *Broker) PrepareNetBlockSyncDataBackends(uNetBlock sdfsapitypes.NetBlockUintptr,
 	syncDataBackends snettypes.PeerGroup) error {
 	return p.doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock, syncDataBackends)
 }

@@ -1,8 +1,8 @@
-package agent
+package broker
 
 import "soloos/common/sdfsapi"
 
-func (p *SWALAgent) SetSDFSClient(sdfsClient sdfsapi.Client) error {
+func (p *Broker) SetSDFSClient(sdfsClient sdfsapi.Client) error {
 	p.sdfsClient = sdfsClient
 	p.posixFS = p.sdfsClient.GetPosixFS()
 
