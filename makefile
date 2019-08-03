@@ -5,7 +5,7 @@ SWAL_LDFLAGS += -X "soloos/swal/version.GitHash=$(shell git rev-parse HEAD)"
 all:swald
 
 swald:
-	$(SWAL_PREFIX) go build -i -ldflags '$(SWAL_LDFLAGS)' -o ./bin/swald ./swald
+	$(SWAL_PREFIX) go build -i -ldflags '$(SWAL_LDFLAGS)' -o ./bin/swald ./apps/swald
 
 include ./make/test
 include ./make/bench

@@ -1,19 +1,19 @@
-package main
+package swald
 
 import (
 	"soloos/sdbone/offheap"
 )
 
-type Env struct {
+type SWALD struct {
 	options       Options
 	offheapDriver *offheap.OffheapDriver
 }
 
-func (p *Env) Init(options Options) error {
+func (p *SWALD) Init(options Options) error {
 	p.options = options
 	return nil
 }
 
-func (p *Env) Serve() error {
+func (p *SWALD) Serve() error {
 	return nil
 }
