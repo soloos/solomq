@@ -27,7 +27,7 @@ func (p *Broker) doHeartBeat(options swalapitypes.HeartBeatServerOptions) {
 
 	for {
 		peer, err = p.SoloOSEnv.SNetDriver.GetPeer(options.PeerID)
-		urlPath = peer.AddressStr() + "/Api/SDFS/Broker/HeartBeat"
+		urlPath = peer.AddressStr() + "/Api/SWAL/Broker/HeartBeat"
 		if err != nil {
 			log.Error("Broker HeartBeat post json error, urlPath:", urlPath, ", err:", err)
 			goto HEARTBEAT_DONE

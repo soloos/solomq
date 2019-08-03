@@ -111,6 +111,12 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 
 func (p *Broker) Serve() error {
 	var err error
+
+	err = p.StartHeartBeat()
+	if err != nil {
+		return err
+	}
+
 	err = p.srpcServer.Serve()
 	return err
 }
