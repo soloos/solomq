@@ -16,7 +16,7 @@ type ClientDriver struct {
 var _ = swalapi.ClientDriver(&ClientDriver{})
 
 func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
-	brokerPeerIDStr string, brokerServeAddr string,
+	brokerSRPCPeerIDStr string, brokerSRPCServeAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {
@@ -24,10 +24,10 @@ func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
 
 	p.SoloOSEnv = soloOSEnv
 
-	var brokerPeerID snettypes.PeerID
-	copy(brokerPeerID[:], []byte(brokerPeerIDStr))
+	var brokerSRPCPeerID snettypes.PeerID
+	copy(brokerSRPCPeerID[:], []byte(brokerSRPCPeerIDStr))
 	err = p.broker.Init(p.SoloOSEnv,
-		brokerPeerID, brokerServeAddr,
+		brokerSRPCPeerID, brokerSRPCServeAddr,
 		dbDriver, dsn,
 		defaultNetBlockCap, defaultMemBlockCap,
 	)

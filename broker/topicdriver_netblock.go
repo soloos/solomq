@@ -54,7 +54,7 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic swalapitypes.
 
 	pNetBlock.SyncDataBackends.Reset()
 	for i := 0; i < pNetBlock.StorDataBackends.Len; i++ {
-		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.broker.peer.ID {
+		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.broker.srpcPeer.ID {
 			pNetBlock.SyncDataBackends.Append(pNetBlock.StorDataBackends.Arr[i], 0)
 		} else {
 			pNetBlock.SyncDataBackends.Append(pTopic.Meta.SWALMemberGroup.Arr[i].PeerID, 1)

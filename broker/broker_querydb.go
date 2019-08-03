@@ -16,7 +16,7 @@ func (p *Broker) RegisterInDB() error {
 	}
 
 	err = sess.ReplaceInto("b_swal_broker").
-		PrimaryColumns("peer_id").PrimaryValues(string(p.peer.ID[:])).
+		PrimaryColumns("peer_id").PrimaryValues(string(p.srpcPeer.ID[:])).
 		Columns("desc").Values(p.srpcServer.srpcServerListenAddr).
 		Exec()
 	if err != nil {

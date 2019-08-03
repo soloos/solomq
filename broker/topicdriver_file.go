@@ -59,7 +59,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 
 	jobNum = 0
 	for i, _ = range pTopic.Meta.SWALMemberGroup.Slice() {
-		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.broker.peer.ID {
+		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.broker.srpcPeer.ID {
 			continue
 		}
 		jobNum++

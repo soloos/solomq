@@ -14,8 +14,9 @@ import (
 
 type Broker struct {
 	*soloosbase.SoloOSEnv
-	peer   snettypes.Peer
-	dbConn sdbapi.Connection
+	srpcPeer snettypes.Peer
+	webPeer  snettypes.Peer
+	dbConn   sdbapi.Connection
 
 	TopicDriver
 	brokerClient swalapi.BrokerClient
@@ -25,14 +26,16 @@ type Broker struct {
 
 	localFsSNetPeer snettypes.Peer
 
-	srpcServer BrokerSRPCServer
+	heartBeatServerOptionsArr []swalapitypes.HeartBeatServerOptions
+	srpcServer                BrokerSRPCServer
+	webServer                 BrokerSRPCServer
 }
 
 func (p *Broker) initLocalFs() error {
 	var err error
 	p.localFsSNetPeer.ID = snet.MakeSysPeerID(fmt.Sprintf("Broker_LOCAL_FS"))
 	p.localFsSNetPeer.SetAddress("LocalFs")
-	p.localFsSNetPeer.ServiceProtocol = snettypes.ProtocolDisk
+	p.localFsSNetPeer.ServiceProtocol = snettypes.ProtocolLocalFS
 	err = p.SNetDriver.RegisterPeer(p.localFsSNetPeer)
 	if err != nil {
 		return err
@@ -40,13 +43,13 @@ func (p *Broker) initLocalFs() error {
 	return nil
 }
 
-func (p *Broker) initSNetPeer(peerID snettypes.PeerID, serveAddr string) error {
+func (p *Broker) initSNetPeer(peerID snettypes.PeerID, srpcServeAddr string) error {
 	var err error
-	p.peer.ID = peerID
-	p.peer.SetAddress(serveAddr)
-	p.peer.ServiceProtocol = swalapitypes.DefaultSWALRPCProtocol
 
-	err = p.SoloOSEnv.SNetDriver.RegisterPeer(p.peer)
+	p.srpcPeer.ID = peerID
+	p.srpcPeer.SetAddress(srpcServeAddr)
+	p.srpcPeer.ServiceProtocol = swalapitypes.DefaultSWALRPCProtocol
+	err = p.SoloOSEnv.SNetDriver.RegisterPeer(p.srpcPeer)
 	if err != nil {
 		return err
 	}
@@ -55,7 +58,7 @@ func (p *Broker) initSNetPeer(peerID snettypes.PeerID, serveAddr string) error {
 }
 
 func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
-	peerID snettypes.PeerID, serveAddr string,
+	srpcPeerID snettypes.PeerID, srpcServeAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {
@@ -63,7 +66,7 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 
 	p.SoloOSEnv = soloOSEnv
 
-	err = p.initSNetPeer(peerID, serveAddr)
+	err = p.initSNetPeer(srpcPeerID, srpcServeAddr)
 	if err != nil {
 		return err
 	}
@@ -88,7 +91,7 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 		return err
 	}
 
-	err = p.srpcServer.Init(p, serveAddr)
+	err = p.srpcServer.Init(p, srpcServeAddr)
 	if err != nil {
 		return err
 	}
@@ -104,10 +107,6 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	}
 
 	return nil
-}
-
-func (p *Broker) GetPeerID() snettypes.PeerID {
-	return p.peer.ID
 }
 
 func (p *Broker) Serve() error {

@@ -1,12 +1,10 @@
 package swald
 
-import (
-	"soloos/sdbone/offheap"
-)
+import "soloos/swal/broker"
 
 type SWALD struct {
-	options       Options
-	offheapDriver *offheap.OffheapDriver
+	options Options
+	broker  broker.Broker
 }
 
 func (p *SWALD) Init(options Options) error {
