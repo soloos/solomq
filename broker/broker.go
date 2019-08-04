@@ -3,6 +3,7 @@ package broker
 import (
 	"fmt"
 	"soloos/common/fsapi"
+	"soloos/common/iron"
 	"soloos/common/sdbapi"
 	"soloos/common/sdfsapi"
 	"soloos/common/snet"
@@ -27,8 +28,8 @@ type Broker struct {
 	localFsSNetPeer snettypes.Peer
 
 	heartBeatServerOptionsArr []swalapitypes.HeartBeatServerOptions
-	srpcServer                BrokerSRPCServer
-	webServer                 BrokerSRPCServer
+	srpcServer                SRPCServer
+	serverDriver              iron.ServerDriver
 }
 
 func (p *Broker) initLocalFs() error {
@@ -96,6 +97,11 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 		return err
 	}
 
+	err = p.serverDriver.Init(&p.srpcServer)
+	if err != nil {
+		return err
+	}
+
 	err = p.initLocalFs()
 	if err != nil {
 		return err
@@ -117,13 +123,18 @@ func (p *Broker) Serve() error {
 		return err
 	}
 
-	err = p.srpcServer.Serve()
-	return err
+	err = p.serverDriver.Serve()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *Broker) Close() error {
 	var err error
-	err = p.srpcServer.Close()
+
+	err = p.serverDriver.Close()
 	if err != nil {
 		return err
 	}

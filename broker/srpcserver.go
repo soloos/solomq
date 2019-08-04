@@ -1,18 +1,21 @@
 package broker
 
 import (
+	"soloos/common/iron"
 	"soloos/common/log"
 	"soloos/common/sdfsapitypes"
 	"soloos/common/snet"
 )
 
-type BrokerSRPCServer struct {
-	broker            *Broker
+type SRPCServer struct {
+	broker               *Broker
 	srpcServerListenAddr string
 	srpcServer           snet.SRPCServer
 }
 
-func (p *BrokerSRPCServer) Init(broker *Broker, srpcServerListenAddr string) error {
+var _ = iron.IServer(&SRPCServer{})
+
+func (p *SRPCServer) Init(broker *Broker, srpcServerListenAddr string) error {
 	var err error
 	p.broker = broker
 	p.srpcServerListenAddr = srpcServerListenAddr
@@ -27,14 +30,18 @@ func (p *BrokerSRPCServer) Init(broker *Broker, srpcServerListenAddr string) err
 	return nil
 }
 
-func (p *BrokerSRPCServer) Serve() error {
+func (p *SRPCServer) ServerName() string {
+	return "SoloOS.SWAL.Broker.SRPCServer"
+}
+
+func (p *SRPCServer) Serve() error {
 	var err error
 	log.Info("broker srpcserver serve at:", p.srpcServerListenAddr)
 	err = p.srpcServer.Serve()
 	return err
 }
 
-func (p *BrokerSRPCServer) Close() error {
+func (p *SRPCServer) Close() error {
 	var err error
 	log.Info("broker srpcserver close at:", p.srpcServerListenAddr)
 	err = p.srpcServer.Close()

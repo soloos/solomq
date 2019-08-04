@@ -10,7 +10,7 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-func (p *BrokerSRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
+func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	var (
 		reqParamData     = make([]byte, serviceReq.ParamSize)
 		reqParam         swalprotocol.TopicPWriteRequest

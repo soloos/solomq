@@ -38,7 +38,7 @@ func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
 
 	var heartBeatServer swalapitypes.HeartBeatServerOptions
 	heartBeatServer.PeerID = snettypes.StrToPeerID(soloBoatWebPeerID)
-	heartBeatServer.DurationMS = 3 * 60 * 1000
+	heartBeatServer.DurationMS = DefaultHeartBeatDurationMS
 	err = p.broker.SetHeartBeatServers([]swalapitypes.HeartBeatServerOptions{heartBeatServer})
 	if err != nil {
 		return err
