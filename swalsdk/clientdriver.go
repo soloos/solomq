@@ -16,6 +16,7 @@ type ClientDriver struct {
 var _ = swalapi.ClientDriver(&ClientDriver{})
 
 func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
+	soloBoatWebPeerID string,
 	brokerSRPCPeerIDStr string, brokerSRPCServeAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
@@ -31,6 +32,14 @@ func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
 		dbDriver, dsn,
 		defaultNetBlockCap, defaultMemBlockCap,
 	)
+	if err != nil {
+		return err
+	}
+
+	var heartBeatServer swalapitypes.HeartBeatServerOptions
+	heartBeatServer.PeerID = snettypes.StrToPeerID(soloBoatWebPeerID)
+	heartBeatServer.DurationMS = 3 * 60 * 1000
+	err = p.broker.SetHeartBeatServers([]swalapitypes.HeartBeatServerOptions{heartBeatServer})
 	if err != nil {
 		return err
 	}
