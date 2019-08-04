@@ -25,7 +25,7 @@ func (p *Broker) prepareSchemaSqls(dbDriver string) []string {
 	sqls = append(sqls, `
 	create table if not exists b_swal_broker (
 		peer_id char(64),
-		desc varchar(512),
+		description varchar(512),
 		primary key(peer_id)
 	);
 	`)

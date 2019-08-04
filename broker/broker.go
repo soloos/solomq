@@ -43,11 +43,11 @@ func (p *Broker) initLocalFs() error {
 	return nil
 }
 
-func (p *Broker) initSNetPeer(peerID snettypes.PeerID, srpcServeAddr string) error {
+func (p *Broker) initSNetPeer(peerID snettypes.PeerID, srpcListenAddr string) error {
 	var err error
 
 	p.srpcPeer.ID = peerID
-	p.srpcPeer.SetAddress(srpcServeAddr)
+	p.srpcPeer.SetAddress(srpcListenAddr)
 	p.srpcPeer.ServiceProtocol = swalapitypes.DefaultSWALRPCProtocol
 	err = p.SoloOSEnv.SNetDriver.RegisterPeer(p.srpcPeer)
 	if err != nil {
@@ -58,7 +58,7 @@ func (p *Broker) initSNetPeer(peerID snettypes.PeerID, srpcServeAddr string) err
 }
 
 func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
-	srpcPeerID snettypes.PeerID, srpcServeAddr string,
+	srpcPeerID snettypes.PeerID, srpcListenAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {
@@ -66,7 +66,7 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 
 	p.SoloOSEnv = soloOSEnv
 
-	err = p.initSNetPeer(srpcPeerID, srpcServeAddr)
+	err = p.initSNetPeer(srpcPeerID, srpcListenAddr)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 		return err
 	}
 
-	err = p.srpcServer.Init(p, srpcServeAddr)
+	err = p.srpcServer.Init(p, srpcListenAddr)
 	if err != nil {
 		return err
 	}
