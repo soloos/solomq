@@ -27,7 +27,7 @@ type Broker struct {
 
 	localFsSNetPeer snettypes.Peer
 
-	heartBeatServerOptionsArr []swalapitypes.HeartBeatServerOptions
+	heartBeatServerOptionsArr []snettypes.HeartBeatServerOptions
 	srpcServer                SRPCServer
 	serverDriver              iron.ServerDriver
 }

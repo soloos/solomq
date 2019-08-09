@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
-func (p *Broker) SetHeartBeatServers(heartBeatServerOptionsArr []swalapitypes.HeartBeatServerOptions) error {
+func (p *Broker) SetHeartBeatServers(heartBeatServerOptionsArr []snettypes.HeartBeatServerOptions) error {
 	p.heartBeatServerOptionsArr = heartBeatServerOptionsArr
 	return nil
 }
 
-func (p *Broker) doHeartBeat(options swalapitypes.HeartBeatServerOptions) {
+func (p *Broker) doHeartBeat(options snettypes.HeartBeatServerOptions) {
 	var (
 		heartBeat swalapitypes.BrokerHeartBeat
 		webret    iron.ApiOutputResult
