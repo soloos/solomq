@@ -1,4 +1,4 @@
-package broker
+package solomq
 
 import (
 	"soloos/common/solodbapitypes"
@@ -6,7 +6,7 @@ import (
 	"soloos/common/snettypes"
 )
 
-func (p *Broker) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofsapitypes.NetBlockUintptr,
+func (p *Solomq) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofsapitypes.NetBlockUintptr,
 	backends snettypes.PeerGroup,
 ) error {
 	var (
@@ -31,7 +31,7 @@ PREPARE_DONE:
 	return err
 }
 
-func (p *Broker) PrepareNetBlockSyncDataBackends(uNetBlock solofsapitypes.NetBlockUintptr,
+func (p *Solomq) PrepareNetBlockSyncDataBackends(uNetBlock solofsapitypes.NetBlockUintptr,
 	syncDataBackends snettypes.PeerGroup) error {
 	return p.doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock, syncDataBackends)
 }

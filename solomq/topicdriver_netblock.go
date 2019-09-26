@@ -1,4 +1,4 @@
-package broker
+package solomq
 
 import (
 	"soloos/common/solofsapitypes"
@@ -28,13 +28,13 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic solomqapitype
 		err               error
 		pTopic                       = uTopic.Ptr()
 		pNetBlock                    = uNetBlock.Ptr()
-		queryNetJobsCount            = pTopic.Meta.SOLOMQMemberGroup.Len
+		queryNetJobsCount            = pTopic.Meta.SolomqMemberGroup.Len
 		queryNetRetArr    chan error = make(chan error, queryNetJobsCount)
 	)
 
-	for _, solomqMember := range pTopic.Meta.SOLOMQMemberGroup.Slice() {
+	for _, solomqMember := range pTopic.Meta.SolomqMemberGroup.Slice() {
 		go func(peerID snettypes.PeerID, uTopic solomqapitypes.TopicUintptr, queryNetRetArr chan error) {
-			queryNetRetArr <- p.broker.brokerClient.PrepareTopicNetBlockMetaData(peerID,
+			queryNetRetArr <- p.solomq.solomqClient.PrepareTopicNetBlockMetaData(peerID,
 				uTopic, uNetBlock, uNetINode, netblockIndex)
 		}(solomqMember.PeerID, uTopic, queryNetRetArr)
 	}
@@ -54,10 +54,10 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic solomqapitype
 
 	pNetBlock.SyncDataBackends.Reset()
 	for i := 0; i < pNetBlock.StorDataBackends.Len; i++ {
-		if pTopic.Meta.SOLOMQMemberGroup.Arr[i].PeerID == p.broker.srpcPeer.ID {
+		if pTopic.Meta.SolomqMemberGroup.Arr[i].PeerID == p.solomq.srpcPeer.ID {
 			pNetBlock.SyncDataBackends.Append(pNetBlock.StorDataBackends.Arr[i], 0)
 		} else {
-			pNetBlock.SyncDataBackends.Append(pTopic.Meta.SOLOMQMemberGroup.Arr[i].PeerID, 1)
+			pNetBlock.SyncDataBackends.Append(pTopic.Meta.SolomqMemberGroup.Arr[i].PeerID, 1)
 			pNetBlock.SyncDataBackends.Append(pNetBlock.StorDataBackends.Arr[i], 0)
 		}
 	}
@@ -84,9 +84,9 @@ func (p *TopicDriver) PrepareNetBlockMetaData(topicID solomqapitypes.TopicID,
 	NetINodeBlockPlacementPolicySetTopicID(&uNetINode.Ptr().MemBlockPlacementPolicy, topicID)
 
 	switch p.computeTopicRole(uTopic) {
-	case solomqapitypes.SOLOMQMemberRoleLeader:
+	case solomqapitypes.SolomqMemberRoleLeader:
 		err = p.prepareNetBlockMetaDataWithRoleLeader(uTopic, uNetBlock, uNetINode, netblockIndex)
-	case solomqapitypes.SOLOMQMemberRoleFollower:
+	case solomqapitypes.SolomqMemberRoleFollower:
 		err = p.prepareNetBlockMetaDataWithRoleFollower(uTopic, uNetBlock, uNetINode, netblockIndex)
 	}
 

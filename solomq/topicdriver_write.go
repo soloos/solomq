@@ -1,10 +1,10 @@
-package broker
+package solomq
 
 import (
 	"soloos/common/solofsapitypes"
 )
 
-func (p *TopicDriver) UploadMemBlockWithSOLOMQ(uJob solofsapitypes.UploadMemBlockJobUintptr,
+func (p *TopicDriver) UploadMemBlockWithSolomq(uJob solofsapitypes.UploadMemBlockJobUintptr,
 	uploadPeerIndex int) error {
 	var topicID = NetINodeBlockPlacementPolicyGetTopicID(
 		&uJob.Ptr().UNetINode.Ptr().MemBlockPlacementPolicy)
@@ -14,7 +14,7 @@ func (p *TopicDriver) UploadMemBlockWithSOLOMQ(uJob solofsapitypes.UploadMemBloc
 		return err
 	}
 
-	return p.broker.brokerClient.UploadMemBlockWithSOLOMQ(uTopic, uJob, uploadPeerIndex)
+	return p.solomq.solomqClient.UploadMemBlockWithSolomq(uTopic, uJob, uploadPeerIndex)
 }
 
 func (p *TopicDriver) UploadMemBlockWithDisk(uJob solofsapitypes.UploadMemBlockJobUintptr,

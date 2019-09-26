@@ -1,8 +1,8 @@
-package broker
+package solomq
 
 import "soloos/common/solofsapi"
 
-func (p *Broker) SetSOLOFSClient(solofsClient solofsapi.Client) error {
+func (p *Solomq) SetSolofsClient(solofsClient solofsapi.Client) error {
 	p.solofsClient = solofsClient
 	p.posixFS = p.solofsClient.GetPosixFS()
 

@@ -1,4 +1,4 @@
-package broker
+package solomq
 
 import (
 	"soloos/common/solodbapitypes"
@@ -8,7 +8,7 @@ import (
 )
 
 type TopicDriver struct {
-	broker *Broker
+	solomq *Solomq
 
 	topicsByID   offheap.LKVTableWithInt64
 	topicsByName sync.Map
@@ -17,14 +17,14 @@ type TopicDriver struct {
 	defaultMemBlockCap int
 }
 
-func (p *TopicDriver) Init(broker *Broker,
+func (p *TopicDriver) Init(solomq *Solomq,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {
 	var err error
 
-	p.broker = broker
+	p.solomq = solomq
 
-	err = p.topicsByID.Init("BrokerTopic",
+	err = p.topicsByID.Init("SolomqTopic",
 		int(solomqapitypes.TopicStructSize), -1, offheap.DefaultKVTableSharedCount,
 		p.topicsByIDInvokeBeforeReleaseObjectFunc)
 	if err != nil {
@@ -121,13 +121,13 @@ func (p *TopicDriver) GetTopicByID(topicID solomqapitypes.TopicID) (solomqapityp
 }
 
 func (p *TopicDriver) MustGetTopic(topicName string,
-	solomqMembers []solomqapitypes.SOLOMQMember) (solomqapitypes.TopicUintptr, error) {
+	solomqMembers []solomqapitypes.SolomqMember) (solomqapitypes.TopicUintptr, error) {
 	var (
 		topicMeta solomqapitypes.TopicMeta
 	)
 
 	topicMeta.TopicName.SetStr(topicName)
-	topicMeta.SOLOMQMemberGroup.SetSOLOMQMembers(solomqMembers)
+	topicMeta.SolomqMemberGroup.SetSolomqMembers(solomqMembers)
 
 	p.InsertTopicInDB(&topicMeta)
 	return p.GetTopicByName(topicName)
@@ -138,10 +138,10 @@ func (p *TopicDriver) ReleaseTopic(uTopic solomqapitypes.TopicUintptr) {
 }
 
 func (p *TopicDriver) computeTopicRole(uTopic solomqapitypes.TopicUintptr) int {
-	for _, backend := range uTopic.Ptr().Meta.SOLOMQMemberGroup.Slice() {
-		if p.broker.srpcPeer.ID == backend.PeerID {
+	for _, backend := range uTopic.Ptr().Meta.SolomqMemberGroup.Slice() {
+		if p.solomq.srpcPeer.ID == backend.PeerID {
 			return backend.Role
 		}
 	}
-	return solomqapitypes.SOLOMQMemberRoleUnknown
+	return solomqapitypes.SolomqMemberRoleUnknown
 }

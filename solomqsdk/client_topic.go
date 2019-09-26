@@ -5,9 +5,9 @@ import (
 	"soloos/common/solomqapitypes"
 )
 
-func (p *Client) initTopic(topicName string, solomqMembers []solomqapitypes.SOLOMQMember) error {
+func (p *Client) initTopic(topicName string, solomqMembers []solomqapitypes.SolomqMember) error {
 	var err error
-	p.uTopic, err = p.clientDriver.broker.MustGetTopic(topicName, solomqMembers)
+	p.uTopic, err = p.clientDriver.solomq.MustGetTopic(topicName, solomqMembers)
 	if err != nil {
 		return err
 	}
@@ -20,17 +20,17 @@ func (p *Client) SendMsg(msg []byte) error {
 }
 
 func (p *Client) OpenTopicFile(path string) (solofsapitypes.FsINodeFileHandlerID, error) {
-	return p.clientDriver.broker.OpenTopicFile(p.uTopic.Ptr().Meta.TopicID, path)
+	return p.clientDriver.solomq.OpenTopicFile(p.uTopic.Ptr().Meta.TopicID, path)
 }
 
 func (p *Client) PrepareNetBlockMetaData(uNetBlock solofsapitypes.NetBlockUintptr,
 	uNetINode solofsapitypes.NetINodeUintptr, netblockIndex int32) error {
-	return p.clientDriver.broker.PrepareNetBlockMetaData(p.uTopic.Ptr().Meta.TopicID,
+	return p.clientDriver.solomq.PrepareNetBlockMetaData(p.uTopic.Ptr().Meta.TopicID,
 		uNetBlock, uNetINode, netblockIndex)
 }
 
-func (p *Client) UploadMemBlockWithSOLOMQ(uJob solofsapitypes.UploadMemBlockJobUintptr,
+func (p *Client) UploadMemBlockWithSolomq(uJob solofsapitypes.UploadMemBlockJobUintptr,
 	uploadPeerIndex int) error {
-	return p.clientDriver.broker.UploadMemBlockWithSOLOMQ(uJob,
+	return p.clientDriver.solomq.UploadMemBlockWithSolomq(uJob,
 		uploadPeerIndex)
 }

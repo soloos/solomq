@@ -1,4 +1,4 @@
-package broker
+package solomq
 
 import (
 	"soloos/common/solofsapi"

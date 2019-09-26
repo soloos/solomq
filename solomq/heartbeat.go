@@ -1,4 +1,4 @@
-package broker
+package solomq
 
 import (
 	"soloos/common/iron"
@@ -8,14 +8,14 @@ import (
 	"time"
 )
 
-func (p *Broker) SetHeartBeatServers(heartBeatServerOptionsArr []snettypes.HeartBeatServerOptions) error {
+func (p *Solomq) SetHeartBeatServers(heartBeatServerOptionsArr []snettypes.HeartBeatServerOptions) error {
 	p.heartBeatServerOptionsArr = heartBeatServerOptionsArr
 	return nil
 }
 
-func (p *Broker) doHeartBeat(options snettypes.HeartBeatServerOptions) {
+func (p *Solomq) doHeartBeat(options snettypes.HeartBeatServerOptions) {
 	var (
-		heartBeat solomqapitypes.BrokerHeartBeat
+		heartBeat solomqapitypes.SolomqHeartBeat
 		webret    iron.ApiOutputResult
 		peer      snettypes.Peer
 		urlPath   string
@@ -26,26 +26,26 @@ func (p *Broker) doHeartBeat(options snettypes.HeartBeatServerOptions) {
 	heartBeat.WebPeerID = p.webPeer.PeerID().Str()
 
 	for {
-		peer, err = p.SoloOSEnv.SNetDriver.GetPeer(options.PeerID)
-		urlPath = peer.AddressStr() + "/Api/SOLOMQ/Broker/HeartBeat"
+		peer, err = p.SoloosEnv.SNetDriver.GetPeer(options.PeerID)
+		urlPath = peer.AddressStr() + "/Api/Solomq/Solomq/HeartBeat"
 		if err != nil {
-			log.Error("Broker HeartBeat post json error, urlPath:", urlPath, ", err:", err)
+			log.Error("Solomq HeartBeat post json error, urlPath:", urlPath, ", err:", err)
 			goto HEARTBEAT_DONE
 		}
 
 		err = iron.PostJSON(urlPath, heartBeat, &webret)
 		if err != nil {
-			log.Error("Broker HeartBeat post json(decode) error, urlPath:", urlPath, ", err:", err)
+			log.Error("Solomq HeartBeat post json(decode) error, urlPath:", urlPath, ", err:", err)
 			goto HEARTBEAT_DONE
 		}
-		log.Info("Broker heartbeat message:", webret)
+		log.Info("Solomq heartbeat message:", webret)
 
 	HEARTBEAT_DONE:
 		time.Sleep(time.Duration(options.DurationMS) * time.Millisecond)
 	}
 }
 
-func (p *Broker) StartHeartBeat() error {
+func (p *Solomq) StartHeartBeat() error {
 	for _, options := range p.heartBeatServerOptionsArr {
 		go p.doHeartBeat(options)
 	}

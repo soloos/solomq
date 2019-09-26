@@ -1,8 +1,8 @@
-package broker
+package solomq
 
 import "soloos/common/log"
 
-func (p *Broker) installSchema(dbDriver string) error {
+func (p *Solomq) installSchema(dbDriver string) error {
 	var (
 		sqls []string
 		err  error
@@ -19,11 +19,11 @@ func (p *Broker) installSchema(dbDriver string) error {
 	return nil
 }
 
-func (p *Broker) prepareSchemaSqls(dbDriver string) []string {
+func (p *Solomq) prepareSchemaSqls(dbDriver string) []string {
 	var sqls []string
 
 	sqls = append(sqls, `
-	create table if not exists b_solomq_broker (
+	create table if not exists b_solomq_solomq (
 		peer_id char(64),
 		description varchar(512),
 		primary key(peer_id)

@@ -1,4 +1,4 @@
-package broker
+package solomq
 
 import (
 	"path/filepath"
@@ -25,9 +25,9 @@ func (p *TopicDriver) OpenFile(topicID solomqapitypes.TopicID, path string) (sol
 	}
 
 	dirPath = filepath.Dir(path)
-	p.broker.posixFS.SimpleMkdirAll(0777, dirPath, 0, 0)
+	p.solomq.posixFS.SimpleMkdirAll(0777, dirPath, 0, 0)
 
-	fsINodeMeta, err = p.broker.posixFS.SimpleOpenFile(path,
+	fsINodeMeta, err = p.solomq.posixFS.SimpleOpenFile(path,
 		p.defaultNetBlockCap, p.defaultNetBlockCap)
 	if err != nil {
 		log.Error("open file failed", path, err)
@@ -39,7 +39,7 @@ func (p *TopicDriver) OpenFile(topicID solomqapitypes.TopicID, path string) (sol
 		return 0, err
 	}
 
-	fdID = p.broker.posixFS.FdTableAllocFd(fsINodeMeta.Ino)
+	fdID = p.solomq.posixFS.FdTableAllocFd(fsINodeMeta.Ino)
 
 	return fdID, err
 }
@@ -58,21 +58,21 @@ func (p *TopicDriver) PrepareTopicMetaData(
 	)
 
 	jobNum = 0
-	for i, _ = range pTopic.Meta.SOLOMQMemberGroup.Slice() {
-		if pTopic.Meta.SOLOMQMemberGroup.Arr[i].PeerID == p.broker.srpcPeer.ID {
+	for i, _ = range pTopic.Meta.SolomqMemberGroup.Slice() {
+		if pTopic.Meta.SolomqMemberGroup.Arr[i].PeerID == p.solomq.srpcPeer.ID {
 			continue
 		}
 		jobNum++
 	}
 	jobRet = make(chan error, jobNum)
 
-	for i, _ = range pTopic.Meta.SOLOMQMemberGroup.Slice() {
+	for i, _ = range pTopic.Meta.SolomqMemberGroup.Slice() {
 		go func(jobRet chan error, index int,
 			peerID snettypes.PeerID, uTopic solomqapitypes.TopicUintptr, fsINodeID solofsapitypes.FsINodeID) {
-			jobRet <- p.broker.brokerClient.PrepareTopicMetaData(
-				uTopic.Ptr().Meta.SOLOMQMemberGroup.Arr[index].PeerID,
+			jobRet <- p.solomq.solomqClient.PrepareTopicMetaData(
+				uTopic.Ptr().Meta.SolomqMemberGroup.Arr[index].PeerID,
 				uTopic, fsINodeID)
-		}(jobRet, i, pTopic.Meta.SOLOMQMemberGroup.Arr[i].PeerID, uTopic, pFsINodeMeta.Ino)
+		}(jobRet, i, pTopic.Meta.SolomqMemberGroup.Arr[i].PeerID, uTopic, pFsINodeMeta.Ino)
 	}
 
 	{
@@ -88,10 +88,10 @@ func (p *TopicDriver) PrepareTopicMetaData(
 		return err
 	}
 
-	policy.SetType(solofsapitypes.BlockPlacementPolicySOLOMQ)
+	policy.SetType(solofsapitypes.BlockPlacementPolicySolomq)
 	NetINodeBlockPlacementPolicySetTopicID(&policy, pTopic.ID)
 
-	err = p.broker.posixFS.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)
+	err = p.solomq.posixFS.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)
 	if err != nil {
 		return err
 	}

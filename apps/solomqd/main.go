@@ -8,7 +8,7 @@ import (
 
 func main() {
 	var (
-		solomqdIns solomqd.SOLOMQD
+		solomqdIns solomqd.SolomqD
 		options  solomqd.Options
 		err      error
 	)

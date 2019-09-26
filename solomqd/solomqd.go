@@ -1,17 +1,17 @@
 package solomqd
 
-import "soloos/solomq/broker"
+import "soloos/solomq/solomq"
 
-type SOLOMQD struct {
+type SolomqD struct {
 	options Options
-	broker  broker.Broker
+	solomq  solomq.Solomq
 }
 
-func (p *SOLOMQD) Init(options Options) error {
+func (p *SolomqD) Init(options Options) error {
 	p.options = options
 	return nil
 }
 
-func (p *SOLOMQD) Serve() error {
+func (p *SolomqD) Serve() error {
 	return nil
 }

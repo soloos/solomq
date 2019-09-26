@@ -2,11 +2,11 @@ package solomqsdk
 
 import "soloos/common/solofsapi"
 
-func (p *Client) SetSOLOFSClient(itSOLOFSClient interface{}) error {
+func (p *Client) SetSolofsClient(itSolofsClient interface{}) error {
 	var err error
-	p.solofsClient = itSOLOFSClient.(solofsapi.Client)
+	p.solofsClient = itSolofsClient.(solofsapi.Client)
 
-	err = p.clientDriver.broker.SetSOLOFSClient(p.solofsClient)
+	err = p.clientDriver.solomq.SetSolofsClient(p.solofsClient)
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-package broker
+package solomq
 
 import (
 	"database/sql"
@@ -15,7 +15,7 @@ func (p *TopicDriver) InsertTopicInDB(pTopicMeta *solomqapitypes.TopicMeta) erro
 		err  error
 	)
 
-	err = p.broker.dbConn.InitSessionWithTx(&sess, &tx)
+	err = p.solomq.dbConn.InitSessionWithTx(&sess, &tx)
 	if err != nil {
 		goto QUERY_DONE
 	}
@@ -32,7 +32,7 @@ func (p *TopicDriver) InsertTopicInDB(pTopicMeta *solomqapitypes.TopicMeta) erro
 		goto QUERY_DONE
 	}
 
-	for _, solomqMember := range pTopicMeta.SOLOMQMemberGroup.Slice() {
+	for _, solomqMember := range pTopicMeta.SolomqMemberGroup.Slice() {
 		_, err = tx.InsertInto("r_solomq_topic_member").
 			Columns("topic_id", "solomq_member_peer_id", "role").
 			Values(pTopicMeta.TopicID,
@@ -68,7 +68,7 @@ func (p *TopicDriver) FetchTopicByNameFromDB(topicName string, pTopicMeta *solom
 		err     error
 	)
 
-	err = p.broker.dbConn.InitSession(&sess)
+	err = p.solomq.dbConn.InitSession(&sess)
 	if err != nil {
 		goto QUERY_DONE
 	}
@@ -111,7 +111,7 @@ func (p *TopicDriver) FetchTopicByIDFromDB(topicID solomqapitypes.TopicID, pTopi
 		err       error
 	)
 
-	err = p.broker.dbConn.InitSession(&sess)
+	err = p.solomq.dbConn.InitSession(&sess)
 	if err != nil {
 		goto QUERY_DONE
 	}
@@ -152,7 +152,7 @@ func (p *TopicDriver) fetchTopicMembersFromDB(
 ) error {
 	var (
 		sqlRows    *sql.Rows
-		solomqMember solomqapitypes.SOLOMQMember
+		solomqMember solomqapitypes.SolomqMember
 		peerIDStr  string
 		err        error
 	)
@@ -170,7 +170,7 @@ func (p *TopicDriver) fetchTopicMembersFromDB(
 			goto QUERY_DONE
 		}
 		solomqMember.PeerID.SetStr(peerIDStr)
-		pTopicMeta.SOLOMQMemberGroup.Append(solomqMember)
+		pTopicMeta.SolomqMemberGroup.Append(solomqMember)
 	}
 
 QUERY_DONE:

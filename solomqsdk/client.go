@@ -16,7 +16,7 @@ type Client struct {
 var _ = solomqapi.Client(&Client{})
 
 func (p *Client) Init(clientDriver *ClientDriver,
-	topicName string, solomqMembers []solomqapitypes.SOLOMQMember,
+	topicName string, solomqMembers []solomqapitypes.SolomqMember,
 ) error {
 	var err error
 	p.clientDriver = clientDriver

@@ -1,4 +1,4 @@
-package broker
+package solomq
 
 import (
 	"soloos/common/iron"
@@ -8,18 +8,18 @@ import (
 )
 
 type SRPCServer struct {
-	broker               *Broker
+	solomq               *Solomq
 	srpcServerListenAddr string
 	srpcServer           snet.SRPCServer
 }
 
 var _ = iron.IServer(&SRPCServer{})
 
-func (p *SRPCServer) Init(broker *Broker, srpcServerListenAddr string) error {
+func (p *SRPCServer) Init(solomq *Solomq, srpcServerListenAddr string) error {
 	var err error
-	p.broker = broker
+	p.solomq = solomq
 	p.srpcServerListenAddr = srpcServerListenAddr
-	err = p.srpcServer.Init(solofsapitypes.DefaultSOLOFSRPCNetwork, p.srpcServerListenAddr)
+	err = p.srpcServer.Init(solofsapitypes.DefaultSolofsRPCNetwork, p.srpcServerListenAddr)
 	if err != nil {
 		return err
 	}
@@ -31,19 +31,19 @@ func (p *SRPCServer) Init(broker *Broker, srpcServerListenAddr string) error {
 }
 
 func (p *SRPCServer) ServerName() string {
-	return "SoloOS.SOLOMQ.Broker.SRPCServer"
+	return "Soloos.Solomq.Solomq.SRPCServer"
 }
 
 func (p *SRPCServer) Serve() error {
 	var err error
-	log.Info("broker srpcserver serve at:", p.srpcServerListenAddr)
+	log.Info("solomq srpcserver serve at:", p.srpcServerListenAddr)
 	err = p.srpcServer.Serve()
 	return err
 }
 
 func (p *SRPCServer) Close() error {
 	var err error
-	log.Info("broker srpcserver close at:", p.srpcServerListenAddr)
+	log.Info("solomq srpcserver close at:", p.srpcServerListenAddr)
 	err = p.srpcServer.Close()
 	return err
 }

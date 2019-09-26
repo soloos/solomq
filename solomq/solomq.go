@@ -1,29 +1,29 @@
-package broker
+package solomq
 
 import (
 	"fmt"
 	"soloos/common/fsapi"
 	"soloos/common/iron"
-	"soloos/common/solodbapi"
-	"soloos/common/solofsapi"
 	"soloos/common/snet"
 	"soloos/common/snettypes"
-	"soloos/common/soloosbase"
+	"soloos/common/solodbapi"
+	"soloos/common/solofsapi"
 	"soloos/common/solomqapi"
 	"soloos/common/solomqapitypes"
+	"soloos/common/soloosbase"
 )
 
-type Broker struct {
-	*soloosbase.SoloOSEnv
+type Solomq struct {
+	*soloosbase.SoloosEnv
 	srpcPeer snettypes.Peer
 	webPeer  snettypes.Peer
 	dbConn   solodbapi.Connection
 
 	TopicDriver
-	brokerClient solomqapi.BrokerClient
+	solomqClient solomqapi.SolomqClient
 
 	solofsClient solofsapi.Client
-	posixFS    fsapi.PosixFS
+	posixFS      fsapi.PosixFS
 
 	localFsSNetPeer snettypes.Peer
 
@@ -32,9 +32,9 @@ type Broker struct {
 	serverDriver              iron.ServerDriver
 }
 
-func (p *Broker) initLocalFs() error {
+func (p *Solomq) initLocalFs() error {
 	var err error
-	p.localFsSNetPeer.ID = snet.MakeSysPeerID(fmt.Sprintf("Broker_LOCAL_FS"))
+	p.localFsSNetPeer.ID = snet.MakeSysPeerID(fmt.Sprintf("Solomq_LOCAL_FS"))
 	p.localFsSNetPeer.SetAddress("LocalFs")
 	p.localFsSNetPeer.ServiceProtocol = snettypes.ProtocolLocalFS
 	err = p.SNetDriver.RegisterPeer(p.localFsSNetPeer)
@@ -44,13 +44,13 @@ func (p *Broker) initLocalFs() error {
 	return nil
 }
 
-func (p *Broker) initSNetPeer(peerID snettypes.PeerID, srpcListenAddr string) error {
+func (p *Solomq) initSNetPeer(peerID snettypes.PeerID, srpcListenAddr string) error {
 	var err error
 
 	p.srpcPeer.ID = peerID
 	p.srpcPeer.SetAddress(srpcListenAddr)
-	p.srpcPeer.ServiceProtocol = solomqapitypes.DefaultSOLOMQRPCProtocol
-	err = p.SoloOSEnv.SNetDriver.RegisterPeer(p.srpcPeer)
+	p.srpcPeer.ServiceProtocol = solomqapitypes.DefaultSolomqRPCProtocol
+	err = p.SoloosEnv.SNetDriver.RegisterPeer(p.srpcPeer)
 	if err != nil {
 		return err
 	}
@@ -58,14 +58,14 @@ func (p *Broker) initSNetPeer(peerID snettypes.PeerID, srpcListenAddr string) er
 	return nil
 }
 
-func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
+func (p *Solomq) Init(soloosEnv *soloosbase.SoloosEnv,
 	srpcPeerID snettypes.PeerID, srpcListenAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {
 	var err error
 
-	p.SoloOSEnv = soloOSEnv
+	p.SoloosEnv = soloosEnv
 
 	err = p.initSNetPeer(srpcPeerID, srpcListenAddr)
 	if err != nil {
@@ -82,7 +82,7 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 		return err
 	}
 
-	err = p.brokerClient.Init(p.SoloOSEnv)
+	err = p.solomqClient.Init(p.SoloosEnv)
 	if err != nil {
 		return err
 	}
@@ -115,7 +115,7 @@ func (p *Broker) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	return nil
 }
 
-func (p *Broker) Serve() error {
+func (p *Solomq) Serve() error {
 	var err error
 
 	err = p.StartHeartBeat()
@@ -131,7 +131,7 @@ func (p *Broker) Serve() error {
 	return nil
 }
 
-func (p *Broker) Close() error {
+func (p *Solomq) Close() error {
 	var err error
 
 	err = p.serverDriver.Close()

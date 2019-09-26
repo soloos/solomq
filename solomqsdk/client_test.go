@@ -7,15 +7,15 @@ import (
 )
 
 func TestClient(t *testing.T) {
-	var soloOSEnv soloosbase.SoloOSEnv
-	util.AssertErrIsNil(soloOSEnv.InitWithSNet(""))
+	var soloosEnv soloosbase.SoloosEnv
+	util.AssertErrIsNil(soloosEnv.InitWithSNet(""))
 
-	// var brokerPeerIDStr = "00"
-	// var brokerServeAddr = "127.0.0.1:9211"
-	// p.SoloOSInstance = &soloosutils.So / oOSInstance
+	// var solomqPeerIDStr = "00"
+	// var solomqServeAddr = "127.0.0.1:9211"
+	// p.SoloosInstance = &soloosutils.So / oOSInstance
 
-	// assert.NoError(t, clientDriver.Init(&soloOSEnv,
-	// &offheap.DefaultOffheapDriver, brokerServeAddr))
+	// assert.NoError(t, clientDriver.Init(&soloosEnv,
+	// &offheap.DefaultOffheapDriver, solomqServeAddr))
 
 	// var client Client
 	// assert.NoError(t, clientDriver.InitClient(&client))
