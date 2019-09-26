@@ -1,12 +1,12 @@
 package broker
 
 import (
-	"soloos/common/sdbapitypes"
-	"soloos/common/sdfsapitypes"
+	"soloos/common/solodbapitypes"
+	"soloos/common/solofsapitypes"
 	"soloos/common/snettypes"
 )
 
-func (p *Broker) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock sdfsapitypes.NetBlockUintptr,
+func (p *Broker) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofsapitypes.NetBlockUintptr,
 	backends snettypes.PeerGroup,
 ) error {
 	var (
@@ -15,7 +15,7 @@ func (p *Broker) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock sdfsapity
 	)
 
 	pNetBlock.IsSyncDataBackendsInited.LockContext()
-	if pNetBlock.IsSyncDataBackendsInited.Load() == sdbapitypes.MetaDataStateInited {
+	if pNetBlock.IsSyncDataBackendsInited.Load() == solodbapitypes.MetaDataStateInited {
 		goto PREPARE_DONE
 	}
 
@@ -24,14 +24,14 @@ func (p *Broker) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock sdfsapity
 	for i, _ := range backends.Slice() {
 		pNetBlock.SyncDataBackends.Append(backends.Arr[i], 0)
 	}
-	pNetBlock.IsSyncDataBackendsInited.Store(sdbapitypes.MetaDataStateInited)
+	pNetBlock.IsSyncDataBackendsInited.Store(solodbapitypes.MetaDataStateInited)
 
 PREPARE_DONE:
 	pNetBlock.IsSyncDataBackendsInited.UnlockContext()
 	return err
 }
 
-func (p *Broker) PrepareNetBlockSyncDataBackends(uNetBlock sdfsapitypes.NetBlockUintptr,
+func (p *Broker) PrepareNetBlockSyncDataBackends(uNetBlock solofsapitypes.NetBlockUintptr,
 	syncDataBackends snettypes.PeerGroup) error {
 	return p.doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock, syncDataBackends)
 }

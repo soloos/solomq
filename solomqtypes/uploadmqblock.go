@@ -1,7 +1,7 @@
-package swaltypes
+package solomqtypes
 
 import (
-	"soloos/sdbone/offheap"
+	"soloos/solodb/offheap"
 	"sync"
 	"unsafe"
 )

@@ -1,10 +1,10 @@
 package broker
 
-import "soloos/common/sdfsapi"
+import "soloos/common/solofsapi"
 
-func (p *Broker) SetSDFSClient(sdfsClient sdfsapi.Client) error {
-	p.sdfsClient = sdfsClient
-	p.posixFS = p.sdfsClient.GetPosixFS()
+func (p *Broker) SetSOLOFSClient(solofsClient solofsapi.Client) error {
+	p.solofsClient = solofsClient
+	p.posixFS = p.solofsClient.GetPosixFS()
 
 	p.posixFS.NetBlockSetPReadMemBlockWithDisk(p.TopicDriver.PReadMemBlockWithDisk)
 	p.posixFS.NetBlockSetUploadMemBlockWithDisk(p.TopicDriver.UploadMemBlockWithDisk)

@@ -3,16 +3,16 @@ package broker
 import (
 	"path/filepath"
 	"soloos/common/log"
-	"soloos/common/sdfsapitypes"
+	"soloos/common/solofsapitypes"
 	"soloos/common/snettypes"
-	"soloos/common/swalapitypes"
+	"soloos/common/solomqapitypes"
 )
 
-func (p *TopicDriver) OpenFile(topicID swalapitypes.TopicID, path string) (sdfsapitypes.FsINodeFileHandlerID, error) {
+func (p *TopicDriver) OpenFile(topicID solomqapitypes.TopicID, path string) (solofsapitypes.FsINodeFileHandlerID, error) {
 	var (
-		uTopic      swalapitypes.TopicUintptr
-		fsINodeMeta sdfsapitypes.FsINodeMeta
-		fdID        sdfsapitypes.FsINodeFileHandlerID
+		uTopic      solomqapitypes.TopicUintptr
+		fsINodeMeta solofsapitypes.FsINodeMeta
+		fdID        solofsapitypes.FsINodeFileHandlerID
 		dirPath     string
 		err         error
 	)
@@ -45,11 +45,11 @@ func (p *TopicDriver) OpenFile(topicID swalapitypes.TopicID, path string) (sdfsa
 }
 
 func (p *TopicDriver) PrepareTopicMetaData(
-	uTopic swalapitypes.TopicUintptr,
-	pFsINodeMeta *sdfsapitypes.FsINodeMeta,
+	uTopic solomqapitypes.TopicUintptr,
+	pFsINodeMeta *solofsapitypes.FsINodeMeta,
 ) error {
 	var (
-		policy sdfsapitypes.MemBlockPlacementPolicy
+		policy solofsapitypes.MemBlockPlacementPolicy
 		pTopic = uTopic.Ptr()
 		jobNum int
 		jobRet chan error
@@ -58,21 +58,21 @@ func (p *TopicDriver) PrepareTopicMetaData(
 	)
 
 	jobNum = 0
-	for i, _ = range pTopic.Meta.SWALMemberGroup.Slice() {
-		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.broker.srpcPeer.ID {
+	for i, _ = range pTopic.Meta.SOLOMQMemberGroup.Slice() {
+		if pTopic.Meta.SOLOMQMemberGroup.Arr[i].PeerID == p.broker.srpcPeer.ID {
 			continue
 		}
 		jobNum++
 	}
 	jobRet = make(chan error, jobNum)
 
-	for i, _ = range pTopic.Meta.SWALMemberGroup.Slice() {
+	for i, _ = range pTopic.Meta.SOLOMQMemberGroup.Slice() {
 		go func(jobRet chan error, index int,
-			peerID snettypes.PeerID, uTopic swalapitypes.TopicUintptr, fsINodeID sdfsapitypes.FsINodeID) {
+			peerID snettypes.PeerID, uTopic solomqapitypes.TopicUintptr, fsINodeID solofsapitypes.FsINodeID) {
 			jobRet <- p.broker.brokerClient.PrepareTopicMetaData(
-				uTopic.Ptr().Meta.SWALMemberGroup.Arr[index].PeerID,
+				uTopic.Ptr().Meta.SOLOMQMemberGroup.Arr[index].PeerID,
 				uTopic, fsINodeID)
-		}(jobRet, i, pTopic.Meta.SWALMemberGroup.Arr[i].PeerID, uTopic, pFsINodeMeta.Ino)
+		}(jobRet, i, pTopic.Meta.SOLOMQMemberGroup.Arr[i].PeerID, uTopic, pFsINodeMeta.Ino)
 	}
 
 	{
@@ -88,7 +88,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 		return err
 	}
 
-	policy.SetType(sdfsapitypes.BlockPlacementPolicySWAL)
+	policy.SetType(solofsapitypes.BlockPlacementPolicySOLOMQ)
 	NetINodeBlockPlacementPolicySetTopicID(&policy, pTopic.ID)
 
 	err = p.broker.posixFS.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)

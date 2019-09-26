@@ -1,12 +1,12 @@
 package broker
 
 import (
-	"soloos/common/sdbapi"
+	"soloos/common/solodbapi"
 )
 
 func (p *Broker) RegisterInDB() error {
 	var (
-		sess sdbapi.Session
+		sess solodbapi.Session
 		err  error
 	)
 
@@ -15,7 +15,7 @@ func (p *Broker) RegisterInDB() error {
 		return err
 	}
 
-	err = sess.ReplaceInto("b_swal_broker").
+	err = sess.ReplaceInto("b_solomq_broker").
 		PrimaryColumns("peer_id").PrimaryValues(string(p.srpcPeer.ID[:])).
 		Columns("description").Values(p.srpcServer.srpcServerListenAddr).
 		Exec()

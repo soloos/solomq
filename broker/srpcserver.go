@@ -3,7 +3,7 @@ package broker
 import (
 	"soloos/common/iron"
 	"soloos/common/log"
-	"soloos/common/sdfsapitypes"
+	"soloos/common/solofsapitypes"
 	"soloos/common/snet"
 )
 
@@ -19,7 +19,7 @@ func (p *SRPCServer) Init(broker *Broker, srpcServerListenAddr string) error {
 	var err error
 	p.broker = broker
 	p.srpcServerListenAddr = srpcServerListenAddr
-	err = p.srpcServer.Init(sdfsapitypes.DefaultSDFSRPCNetwork, p.srpcServerListenAddr)
+	err = p.srpcServer.Init(solofsapitypes.DefaultSOLOFSRPCNetwork, p.srpcServerListenAddr)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (p *SRPCServer) Init(broker *Broker, srpcServerListenAddr string) error {
 }
 
 func (p *SRPCServer) ServerName() string {
-	return "SoloOS.SWAL.Broker.SRPCServer"
+	return "SoloOS.SOLOMQ.Broker.SRPCServer"
 }
 
 func (p *SRPCServer) Serve() error {

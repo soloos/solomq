@@ -1,5 +1,5 @@
 
-bench-swalsdk:
-	cd src/.//swalsdk/ && go test -bench=. -benchmem 
+bench-solomqsdk:
+	cd src/.//solomqsdk/ && go test -bench=. -benchmem 
 
-bench: bench-swalsdk
+bench: bench-solomqsdk

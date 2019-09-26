@@ -1,11 +1,11 @@
 package broker
 
 import (
-	"soloos/common/sdbapitypes"
-	"soloos/common/sdfsapi"
-	"soloos/common/sdfsapitypes"
+	"soloos/common/solodbapitypes"
+	"soloos/common/solofsapi"
+	"soloos/common/solofsapitypes"
 	"soloos/common/snettypes"
-	"soloos/common/swalprotocol"
+	"soloos/common/solomqprotocol"
 
 	flatbuffers "github.com/google/flatbuffers/go"
 )
@@ -13,10 +13,10 @@ import (
 func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	var (
 		reqParamData     = make([]byte, serviceReq.ParamSize)
-		reqParam         swalprotocol.TopicPWriteRequest
+		reqParam         solomqprotocol.TopicPWriteRequest
 		syncDataBackends snettypes.PeerGroup
 		peerID           snettypes.PeerID
-		uNetBlock        sdfsapitypes.NetBlockUintptr
+		uNetBlock        solofsapitypes.NetBlockUintptr
 		i                int
 		err              error
 	)
@@ -33,8 +33,8 @@ func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	// get uNetINode
 	var (
 		protocolBuilder    flatbuffers.Builder
-		netINodeID         sdfsapitypes.NetINodeID
-		uNetINode          sdfsapitypes.NetINodeUintptr
+		netINodeID         solofsapitypes.NetINodeID
+		uNetINode          solofsapitypes.NetINodeUintptr
 		firstNetBlockIndex int32
 		lastNetBlockIndex  int32
 		netBlockIndex      int32
@@ -44,11 +44,11 @@ func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	uNetINode, err = p.broker.posixFS.GetNetINode(netINodeID)
 	defer p.broker.posixFS.ReleaseNetINode(uNetINode)
 	if err != nil {
-		if err == sdfsapitypes.ErrObjectNotExists {
-			sdfsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_404)
+		if err == solofsapitypes.ErrObjectNotExists {
+			solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_404)
 			goto SERVICE_DONE
 		} else {
-			sdfsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_502)
+			solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_502)
 			goto SERVICE_DONE
 		}
 	}
@@ -68,11 +68,11 @@ func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 		uNetBlock, err = p.broker.posixFS.MustGetNetBlock(uNetINode, netBlockIndex)
 		defer p.broker.posixFS.ReleaseNetBlock(uNetBlock)
 		if err != nil {
-			sdfsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_502)
+			solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_502)
 			goto SERVICE_DONE
 		}
 
-		if uNetBlock.Ptr().IsSyncDataBackendsInited.Load() == sdbapitypes.MetaDataStateUninited {
+		if uNetBlock.Ptr().IsSyncDataBackendsInited.Load() == solodbapitypes.MetaDataStateUninited {
 			p.broker.PrepareNetBlockSyncDataBackends(uNetBlock, syncDataBackends)
 		}
 	}
@@ -90,7 +90,7 @@ SERVICE_DONE:
 	}
 
 	if err == nil {
-		sdfsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_OK)
+		solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_OK)
 	}
 
 	respBody := protocolBuilder.Bytes[protocolBuilder.Head():]

@@ -4,25 +4,25 @@ import (
 	"fmt"
 	"soloos/common/fsapi"
 	"soloos/common/iron"
-	"soloos/common/sdbapi"
-	"soloos/common/sdfsapi"
+	"soloos/common/solodbapi"
+	"soloos/common/solofsapi"
 	"soloos/common/snet"
 	"soloos/common/snettypes"
 	"soloos/common/soloosbase"
-	"soloos/common/swalapi"
-	"soloos/common/swalapitypes"
+	"soloos/common/solomqapi"
+	"soloos/common/solomqapitypes"
 )
 
 type Broker struct {
 	*soloosbase.SoloOSEnv
 	srpcPeer snettypes.Peer
 	webPeer  snettypes.Peer
-	dbConn   sdbapi.Connection
+	dbConn   solodbapi.Connection
 
 	TopicDriver
-	brokerClient swalapi.BrokerClient
+	brokerClient solomqapi.BrokerClient
 
-	sdfsClient sdfsapi.Client
+	solofsClient solofsapi.Client
 	posixFS    fsapi.PosixFS
 
 	localFsSNetPeer snettypes.Peer
@@ -49,7 +49,7 @@ func (p *Broker) initSNetPeer(peerID snettypes.PeerID, srpcListenAddr string) er
 
 	p.srpcPeer.ID = peerID
 	p.srpcPeer.SetAddress(srpcListenAddr)
-	p.srpcPeer.ServiceProtocol = swalapitypes.DefaultSWALRPCProtocol
+	p.srpcPeer.ServiceProtocol = solomqapitypes.DefaultSOLOMQRPCProtocol
 	err = p.SoloOSEnv.SNetDriver.RegisterPeer(p.srpcPeer)
 	if err != nil {
 		return err

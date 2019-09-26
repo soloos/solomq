@@ -1,9 +1,9 @@
 package broker
 
 import (
-	"soloos/common/sdfsapi"
+	"soloos/common/solofsapi"
 	"soloos/common/snettypes"
-	"soloos/common/swalprotocol"
+	"soloos/common/solomqprotocol"
 
 	flatbuffers "github.com/google/flatbuffers/go"
 )
@@ -11,7 +11,7 @@ import (
 func (p *SRPCServer) ctrTopicPrepare(serviceReq *snettypes.NetQuery) error {
 	var (
 		reqParamData = make([]byte, serviceReq.ParamSize)
-		reqParam     swalprotocol.TopicPrepareRequest
+		reqParam     solomqprotocol.TopicPrepareRequest
 		err          error
 	)
 
@@ -35,7 +35,7 @@ SERVICE_DONE:
 	}
 
 	if err == nil {
-		sdfsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_OK)
+		solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_OK)
 	}
 
 	respBody := protocolBuilder.Bytes[protocolBuilder.Head():]

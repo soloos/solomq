@@ -1,4 +1,4 @@
-package swald
+package solomqd
 
 type Options struct {
 }

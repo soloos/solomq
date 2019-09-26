@@ -1,11 +1,11 @@
-package swalsdk
+package solomqsdk
 
 import (
 	"soloos/common/snettypes"
 	"soloos/common/soloosbase"
-	"soloos/common/swalapi"
-	"soloos/common/swalapitypes"
-	"soloos/swal/broker"
+	"soloos/common/solomqapi"
+	"soloos/common/solomqapitypes"
+	"soloos/solomq/broker"
 )
 
 type ClientDriver struct {
@@ -13,7 +13,7 @@ type ClientDriver struct {
 	broker broker.Broker
 }
 
-var _ = swalapi.ClientDriver(&ClientDriver{})
+var _ = solomqapi.ClientDriver(&ClientDriver{})
 
 func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	soloBoatWebPeerID string,
@@ -47,13 +47,13 @@ func (p *ClientDriver) Init(soloOSEnv *soloosbase.SoloOSEnv,
 	return nil
 }
 
-func (p *ClientDriver) InitClient(itClient swalapi.Client,
-	topicIDStr string, swalMembers []swalapitypes.SWALMember,
+func (p *ClientDriver) InitClient(itClient solomqapi.Client,
+	topicIDStr string, solomqMembers []solomqapitypes.SOLOMQMember,
 ) error {
 
 	var err error
 	client := itClient.(*Client)
-	err = client.Init(p, topicIDStr, swalMembers)
+	err = client.Init(p, topicIDStr, solomqMembers)
 	if err != nil {
 		return err
 	}

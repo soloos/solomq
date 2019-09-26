@@ -1,4 +1,4 @@
-package swalsdk
+package solomqsdk
 
 import (
 	"soloos/common/soloosbase"

@@ -3,13 +3,13 @@ package main
 import (
 	"os"
 	"soloos/common/util"
-	"soloos/swal/swald"
+	"soloos/solomq/solomqd"
 )
 
 func main() {
 	var (
-		swaldIns swald.SWALD
-		options  swald.Options
+		solomqdIns solomqd.SOLOMQD
+		options  solomqd.Options
 		err      error
 	)
 
@@ -18,6 +18,6 @@ func main() {
 	err = util.LoadOptionsFile(optionsFile, &options)
 	util.AssertErrIsNil(err)
 
-	util.AssertErrIsNil(swaldIns.Init(options))
-	util.AssertErrIsNil(swaldIns.Serve())
+	util.AssertErrIsNil(solomqdIns.Init(options))
+	util.AssertErrIsNil(solomqdIns.Serve())
 }

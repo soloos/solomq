@@ -4,7 +4,7 @@ import (
 	"soloos/common/iron"
 	"soloos/common/log"
 	"soloos/common/snettypes"
-	"soloos/common/swalapitypes"
+	"soloos/common/solomqapitypes"
 	"time"
 )
 
@@ -15,7 +15,7 @@ func (p *Broker) SetHeartBeatServers(heartBeatServerOptionsArr []snettypes.Heart
 
 func (p *Broker) doHeartBeat(options snettypes.HeartBeatServerOptions) {
 	var (
-		heartBeat swalapitypes.BrokerHeartBeat
+		heartBeat solomqapitypes.BrokerHeartBeat
 		webret    iron.ApiOutputResult
 		peer      snettypes.Peer
 		urlPath   string
@@ -27,7 +27,7 @@ func (p *Broker) doHeartBeat(options snettypes.HeartBeatServerOptions) {
 
 	for {
 		peer, err = p.SoloOSEnv.SNetDriver.GetPeer(options.PeerID)
-		urlPath = peer.AddressStr() + "/Api/SWAL/Broker/HeartBeat"
+		urlPath = peer.AddressStr() + "/Api/SOLOMQ/Broker/HeartBeat"
 		if err != nil {
 			log.Error("Broker HeartBeat post json error, urlPath:", urlPath, ", err:", err)
 			goto HEARTBEAT_DONE

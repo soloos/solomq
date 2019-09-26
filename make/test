@@ -1,5 +1,5 @@
 
-test-swalsdk:
-	go test .//swalsdk
+test-solomqsdk:
+	go test .//solomqsdk
 
-test: test-swalsdk
+test: test-solomqsdk

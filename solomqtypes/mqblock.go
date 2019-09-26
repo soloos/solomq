@@ -1,10 +1,10 @@
-package swaltypes
+package solomqtypes
 
 import (
 	"reflect"
 	"soloos/common/log"
 	"soloos/common/snettypes"
-	"soloos/sdbone/offheap"
+	"soloos/solodb/offheap"
 	"sync"
 	"unsafe"
 )

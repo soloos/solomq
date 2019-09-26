@@ -1,42 +1,42 @@
 package broker
 
 import (
-	"soloos/common/sdfsapitypes"
+	"soloos/common/solofsapitypes"
 	"soloos/common/snettypes"
-	"soloos/common/swalapitypes"
+	"soloos/common/solomqapitypes"
 	"unsafe"
 )
 
 func NetINodeBlockPlacementPolicySetTopicID(
-	pPolicy *sdfsapitypes.MemBlockPlacementPolicy,
-	topicID swalapitypes.TopicID,
+	pPolicy *solofsapitypes.MemBlockPlacementPolicy,
+	topicID solomqapitypes.TopicID,
 ) {
-	*(*swalapitypes.TopicID)(unsafe.Pointer(&(pPolicy[sdfsapitypes.MemBlockPlacementPolicyBodyOff]))) =
-		swalapitypes.TopicID(topicID)
+	*(*solomqapitypes.TopicID)(unsafe.Pointer(&(pPolicy[solofsapitypes.MemBlockPlacementPolicyBodyOff]))) =
+		solomqapitypes.TopicID(topicID)
 }
 
 func NetINodeBlockPlacementPolicyGetTopicID(
-	pPolicy *sdfsapitypes.MemBlockPlacementPolicy,
-) swalapitypes.TopicID {
-	return (*(*swalapitypes.TopicID)(unsafe.Pointer(&(pPolicy[sdfsapitypes.MemBlockPlacementPolicyBodyOff]))))
+	pPolicy *solofsapitypes.MemBlockPlacementPolicy,
+) solomqapitypes.TopicID {
+	return (*(*solomqapitypes.TopicID)(unsafe.Pointer(&(pPolicy[solofsapitypes.MemBlockPlacementPolicyBodyOff]))))
 }
 
-func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic swalapitypes.TopicUintptr,
-	uNetBlock sdfsapitypes.NetBlockUintptr,
-	uNetINode sdfsapitypes.NetINodeUintptr, netblockIndex int32) error {
+func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic solomqapitypes.TopicUintptr,
+	uNetBlock solofsapitypes.NetBlockUintptr,
+	uNetINode solofsapitypes.NetINodeUintptr, netblockIndex int32) error {
 	var (
 		err               error
 		pTopic                       = uTopic.Ptr()
 		pNetBlock                    = uNetBlock.Ptr()
-		queryNetJobsCount            = pTopic.Meta.SWALMemberGroup.Len
+		queryNetJobsCount            = pTopic.Meta.SOLOMQMemberGroup.Len
 		queryNetRetArr    chan error = make(chan error, queryNetJobsCount)
 	)
 
-	for _, swalMember := range pTopic.Meta.SWALMemberGroup.Slice() {
-		go func(peerID snettypes.PeerID, uTopic swalapitypes.TopicUintptr, queryNetRetArr chan error) {
+	for _, solomqMember := range pTopic.Meta.SOLOMQMemberGroup.Slice() {
+		go func(peerID snettypes.PeerID, uTopic solomqapitypes.TopicUintptr, queryNetRetArr chan error) {
 			queryNetRetArr <- p.broker.brokerClient.PrepareTopicNetBlockMetaData(peerID,
 				uTopic, uNetBlock, uNetINode, netblockIndex)
-		}(swalMember.PeerID, uTopic, queryNetRetArr)
+		}(solomqMember.PeerID, uTopic, queryNetRetArr)
 	}
 
 	{
@@ -54,10 +54,10 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic swalapitypes.
 
 	pNetBlock.SyncDataBackends.Reset()
 	for i := 0; i < pNetBlock.StorDataBackends.Len; i++ {
-		if pTopic.Meta.SWALMemberGroup.Arr[i].PeerID == p.broker.srpcPeer.ID {
+		if pTopic.Meta.SOLOMQMemberGroup.Arr[i].PeerID == p.broker.srpcPeer.ID {
 			pNetBlock.SyncDataBackends.Append(pNetBlock.StorDataBackends.Arr[i], 0)
 		} else {
-			pNetBlock.SyncDataBackends.Append(pTopic.Meta.SWALMemberGroup.Arr[i].PeerID, 1)
+			pNetBlock.SyncDataBackends.Append(pTopic.Meta.SOLOMQMemberGroup.Arr[i].PeerID, 1)
 			pNetBlock.SyncDataBackends.Append(pNetBlock.StorDataBackends.Arr[i], 0)
 		}
 	}
@@ -65,16 +65,16 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic swalapitypes.
 	return nil
 }
 
-func (p *TopicDriver) prepareNetBlockMetaDataWithRoleFollower(uTopic swalapitypes.TopicUintptr,
-	uNetBlock sdfsapitypes.NetBlockUintptr,
-	uNetINode sdfsapitypes.NetINodeUintptr, netblockIndex int32) error {
+func (p *TopicDriver) prepareNetBlockMetaDataWithRoleFollower(uTopic solomqapitypes.TopicUintptr,
+	uNetBlock solofsapitypes.NetBlockUintptr,
+	uNetINode solofsapitypes.NetINodeUintptr, netblockIndex int32) error {
 	panic("fuck shit")
 	return nil
 }
 
-func (p *TopicDriver) PrepareNetBlockMetaData(topicID swalapitypes.TopicID,
-	uNetBlock sdfsapitypes.NetBlockUintptr,
-	uNetINode sdfsapitypes.NetINodeUintptr, netblockIndex int32) error {
+func (p *TopicDriver) PrepareNetBlockMetaData(topicID solomqapitypes.TopicID,
+	uNetBlock solofsapitypes.NetBlockUintptr,
+	uNetINode solofsapitypes.NetINodeUintptr, netblockIndex int32) error {
 	var uTopic, err = p.GetTopicByID(topicID)
 	defer p.ReleaseTopic(uTopic)
 	if err != nil {
@@ -84,9 +84,9 @@ func (p *TopicDriver) PrepareNetBlockMetaData(topicID swalapitypes.TopicID,
 	NetINodeBlockPlacementPolicySetTopicID(&uNetINode.Ptr().MemBlockPlacementPolicy, topicID)
 
 	switch p.computeTopicRole(uTopic) {
-	case swalapitypes.SWALMemberRoleLeader:
+	case solomqapitypes.SOLOMQMemberRoleLeader:
 		err = p.prepareNetBlockMetaDataWithRoleLeader(uTopic, uNetBlock, uNetINode, netblockIndex)
-	case swalapitypes.SWALMemberRoleFollower:
+	case solomqapitypes.SOLOMQMemberRoleFollower:
 		err = p.prepareNetBlockMetaDataWithRoleFollower(uTopic, uNetBlock, uNetINode, netblockIndex)
 	}
 

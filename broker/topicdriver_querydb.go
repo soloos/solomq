@@ -2,15 +2,15 @@ package broker
 
 import (
 	"database/sql"
-	"soloos/common/sdbapi"
-	"soloos/common/sdbapitypes"
-	"soloos/common/swalapitypes"
+	"soloos/common/solodbapi"
+	"soloos/common/solodbapitypes"
+	"soloos/common/solomqapitypes"
 )
 
-func (p *TopicDriver) InsertTopicInDB(pTopicMeta *swalapitypes.TopicMeta) error {
+func (p *TopicDriver) InsertTopicInDB(pTopicMeta *solomqapitypes.TopicMeta) error {
 	var (
-		sess sdbapi.Session
-		tx   sdbapi.Tx
+		sess solodbapi.Session
+		tx   solodbapi.Tx
 		res  sql.Result
 		err  error
 	)
@@ -20,7 +20,7 @@ func (p *TopicDriver) InsertTopicInDB(pTopicMeta *swalapitypes.TopicMeta) error 
 		goto QUERY_DONE
 	}
 
-	res, err = tx.InsertInto("b_swal_topic").Columns("topic_name").
+	res, err = tx.InsertInto("b_solomq_topic").Columns("topic_name").
 		Values(pTopicMeta.TopicName.Str()).
 		Exec()
 	if err != nil {
@@ -32,12 +32,12 @@ func (p *TopicDriver) InsertTopicInDB(pTopicMeta *swalapitypes.TopicMeta) error 
 		goto QUERY_DONE
 	}
 
-	for _, swalMember := range pTopicMeta.SWALMemberGroup.Slice() {
-		_, err = tx.InsertInto("r_swal_topic_member").
-			Columns("topic_id", "swal_member_peer_id", "role").
+	for _, solomqMember := range pTopicMeta.SOLOMQMemberGroup.Slice() {
+		_, err = tx.InsertInto("r_solomq_topic_member").
+			Columns("topic_id", "solomq_member_peer_id", "role").
 			Values(pTopicMeta.TopicID,
-				swalMember.PeerID.Str(),
-				swalMember.Role).
+				solomqMember.PeerID.Str(),
+				solomqMember.Role).
 			Exec()
 		if err != nil {
 			goto QUERY_DONE
@@ -47,7 +47,7 @@ func (p *TopicDriver) InsertTopicInDB(pTopicMeta *swalapitypes.TopicMeta) error 
 QUERY_DONE:
 	if err != nil {
 		tx.RollbackUnlessCommitted()
-		if sdbapi.IsDuplicateEntryError(err) {
+		if solodbapi.IsDuplicateEntryError(err) {
 			err = nil
 		}
 		return err
@@ -61,9 +61,9 @@ QUERY_DONE:
 	return nil
 }
 
-func (p *TopicDriver) FetchTopicByNameFromDB(topicName string, pTopicMeta *swalapitypes.TopicMeta) error {
+func (p *TopicDriver) FetchTopicByNameFromDB(topicName string, pTopicMeta *solomqapitypes.TopicMeta) error {
 	var (
-		sess    sdbapi.Session
+		sess    solodbapi.Session
 		sqlRows *sql.Rows
 		err     error
 	)
@@ -74,14 +74,14 @@ func (p *TopicDriver) FetchTopicByNameFromDB(topicName string, pTopicMeta *swala
 	}
 
 	sqlRows, err = sess.Select("topic_id", "topic_name").
-		From("b_swal_topic").
+		From("b_solomq_topic").
 		Where("topic_name=?", topicName).Rows()
 	if err != nil {
 		goto QUERY_DONE
 	}
 
 	if sqlRows.Next() == false {
-		err = sdbapitypes.ErrObjectNotExists
+		err = solodbapitypes.ErrObjectNotExists
 		goto QUERY_DONE
 	}
 
@@ -103,9 +103,9 @@ QUERY_DONE:
 	return err
 }
 
-func (p *TopicDriver) FetchTopicByIDFromDB(topicID swalapitypes.TopicID, pTopicMeta *swalapitypes.TopicMeta) error {
+func (p *TopicDriver) FetchTopicByIDFromDB(topicID solomqapitypes.TopicID, pTopicMeta *solomqapitypes.TopicMeta) error {
 	var (
-		sess      sdbapi.Session
+		sess      solodbapi.Session
 		sqlRows   *sql.Rows
 		topicName string
 		err       error
@@ -117,14 +117,14 @@ func (p *TopicDriver) FetchTopicByIDFromDB(topicID swalapitypes.TopicID, pTopicM
 	}
 
 	sqlRows, err = sess.Select("topic_id", "topic_name").
-		From("b_swal_topic").
+		From("b_solomq_topic").
 		Where("topic_id=?", topicID).Rows()
 	if err != nil {
 		goto QUERY_DONE
 	}
 
 	if sqlRows.Next() == false {
-		err = sdbapitypes.ErrObjectNotExists
+		err = solodbapitypes.ErrObjectNotExists
 		goto QUERY_DONE
 	}
 
@@ -147,30 +147,30 @@ QUERY_DONE:
 }
 
 func (p *TopicDriver) fetchTopicMembersFromDB(
-	sess *sdbapi.Session,
-	pTopicMeta *swalapitypes.TopicMeta,
+	sess *solodbapi.Session,
+	pTopicMeta *solomqapitypes.TopicMeta,
 ) error {
 	var (
 		sqlRows    *sql.Rows
-		swalMember swalapitypes.SWALMember
+		solomqMember solomqapitypes.SOLOMQMember
 		peerIDStr  string
 		err        error
 	)
 
-	sqlRows, err = sess.Select("swal_member_peer_id", "role").
-		From("r_swal_topic_member").
+	sqlRows, err = sess.Select("solomq_member_peer_id", "role").
+		From("r_solomq_topic_member").
 		Where("topic_id=?", pTopicMeta.TopicID).Rows()
 	if err != nil {
 		goto QUERY_DONE
 	}
 
 	for sqlRows.Next() {
-		err = sqlRows.Scan(&peerIDStr, &swalMember.Role)
+		err = sqlRows.Scan(&peerIDStr, &solomqMember.Role)
 		if err != nil {
 			goto QUERY_DONE
 		}
-		swalMember.PeerID.SetStr(peerIDStr)
-		pTopicMeta.SWALMemberGroup.Append(swalMember)
+		solomqMember.PeerID.SetStr(peerIDStr)
+		pTopicMeta.SOLOMQMemberGroup.Append(solomqMember)
 	}
 
 QUERY_DONE:
