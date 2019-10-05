@@ -1,8 +1,8 @@
 package solomq
 
 import (
-	"soloos/common/solofsapitypes"
 	"soloos/common/snettypes"
+	"soloos/common/solofsapitypes"
 	"soloos/common/solomqapitypes"
 	"unsafe"
 )

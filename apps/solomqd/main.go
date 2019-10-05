@@ -9,8 +9,8 @@ import (
 func main() {
 	var (
 		solomqdIns solomqd.SolomqD
-		options  solomqd.Options
-		err      error
+		options    solomqd.Options
+		err        error
 	)
 
 	optionsFile := os.Args[1]

@@ -3,8 +3,8 @@ package solomq
 import (
 	"path/filepath"
 	"soloos/common/log"
-	"soloos/common/solofsapitypes"
 	"soloos/common/snettypes"
+	"soloos/common/solofsapitypes"
 	"soloos/common/solomqapitypes"
 )
 

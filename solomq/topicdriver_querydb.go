@@ -151,10 +151,10 @@ func (p *TopicDriver) fetchTopicMembersFromDB(
 	pTopicMeta *solomqapitypes.TopicMeta,
 ) error {
 	var (
-		sqlRows    *sql.Rows
+		sqlRows      *sql.Rows
 		solomqMember solomqapitypes.SolomqMember
-		peerIDStr  string
-		err        error
+		peerIDStr    string
+		err          error
 	)
 
 	sqlRows, err = sess.Select("solomq_member_peer_id", "role").

@@ -3,8 +3,8 @@ package solomq
 import (
 	"soloos/common/iron"
 	"soloos/common/log"
-	"soloos/common/solofsapitypes"
 	"soloos/common/snet"
+	"soloos/common/solofsapitypes"
 )
 
 type SrpcServer struct {

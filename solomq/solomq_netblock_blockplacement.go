@@ -1,9 +1,9 @@
 package solomq
 
 import (
+	"soloos/common/snettypes"
 	"soloos/common/solodbapitypes"
 	"soloos/common/solofsapitypes"
-	"soloos/common/snettypes"
 )
 
 func (p *Solomq) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofsapitypes.NetBlockUintptr,
