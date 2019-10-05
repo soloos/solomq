@@ -17,7 +17,7 @@ var _ = solomqapi.ClientDriver(&ClientDriver{})
 
 func (p *ClientDriver) Init(soloosEnv *soloosbase.SoloosEnv,
 	soloBoatWebPeerID string,
-	solomqSRPCPeerIDStr string, solomqSRPCServeAddr string,
+	solomqSrpcPeerIDStr string, solomqSrpcServeAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {
@@ -25,10 +25,10 @@ func (p *ClientDriver) Init(soloosEnv *soloosbase.SoloosEnv,
 
 	p.SoloosEnv = soloosEnv
 
-	var solomqSRPCPeerID snettypes.PeerID
-	copy(solomqSRPCPeerID[:], []byte(solomqSRPCPeerIDStr))
+	var solomqSrpcPeerID snettypes.PeerID
+	copy(solomqSrpcPeerID[:], []byte(solomqSrpcPeerIDStr))
 	err = p.solomq.Init(p.SoloosEnv,
-		solomqSRPCPeerID, solomqSRPCServeAddr,
+		solomqSrpcPeerID, solomqSrpcServeAddr,
 		dbDriver, dsn,
 		defaultNetBlockCap, defaultMemBlockCap,
 	)

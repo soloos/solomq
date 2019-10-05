@@ -7,15 +7,15 @@ import (
 	"soloos/common/snet"
 )
 
-type SRPCServer struct {
+type SrpcServer struct {
 	solomq               *Solomq
 	srpcServerListenAddr string
-	srpcServer           snet.SRPCServer
+	srpcServer           snet.SrpcServer
 }
 
-var _ = iron.IServer(&SRPCServer{})
+var _ = iron.IServer(&SrpcServer{})
 
-func (p *SRPCServer) Init(solomq *Solomq, srpcServerListenAddr string) error {
+func (p *SrpcServer) Init(solomq *Solomq, srpcServerListenAddr string) error {
 	var err error
 	p.solomq = solomq
 	p.srpcServerListenAddr = srpcServerListenAddr
@@ -30,18 +30,18 @@ func (p *SRPCServer) Init(solomq *Solomq, srpcServerListenAddr string) error {
 	return nil
 }
 
-func (p *SRPCServer) ServerName() string {
-	return "Soloos.Solomq.Solomq.SRPCServer"
+func (p *SrpcServer) ServerName() string {
+	return "Soloos.Solomq.Solomq.SrpcServer"
 }
 
-func (p *SRPCServer) Serve() error {
+func (p *SrpcServer) Serve() error {
 	var err error
 	log.Info("solomq srpcserver serve at:", p.srpcServerListenAddr)
 	err = p.srpcServer.Serve()
 	return err
 }
 
-func (p *SRPCServer) Close() error {
+func (p *SrpcServer) Close() error {
 	var err error
 	log.Info("solomq srpcserver close at:", p.srpcServerListenAddr)
 	err = p.srpcServer.Close()

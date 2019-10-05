@@ -8,10 +8,10 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-func (p *SRPCServer) ctrTopicPrepare(serviceReq *snettypes.NetQuery) error {
+func (p *SrpcServer) ctrTopicPrepare(serviceReq *snettypes.NetQuery) error {
 	var (
 		reqParamData = make([]byte, serviceReq.ParamSize)
-		reqParam     solomqprotocol.TopicPrepareRequest
+		reqParam     solomqprotocol.TopicPrepareReq
 		err          error
 	)
 

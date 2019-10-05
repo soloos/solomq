@@ -23,12 +23,12 @@ type Solomq struct {
 	solomqClient solomqapi.SolomqClient
 
 	solofsClient solofsapi.Client
-	posixFS      fsapi.PosixFS
+	posixFs      fsapi.PosixFs
 
 	localFsSNetPeer snettypes.Peer
 
 	heartBeatServerOptionsArr []snettypes.HeartBeatServerOptions
-	srpcServer                SRPCServer
+	srpcServer                SrpcServer
 	serverDriver              iron.ServerDriver
 }
 
@@ -36,7 +36,7 @@ func (p *Solomq) initLocalFs() error {
 	var err error
 	p.localFsSNetPeer.ID = snet.MakeSysPeerID(fmt.Sprintf("Solomq_LOCAL_FS"))
 	p.localFsSNetPeer.SetAddress("LocalFs")
-	p.localFsSNetPeer.ServiceProtocol = snettypes.ProtocolLocalFS
+	p.localFsSNetPeer.ServiceProtocol = snettypes.ProtocolLocalFs
 	err = p.SNetDriver.RegisterPeer(p.localFsSNetPeer)
 	if err != nil {
 		return err

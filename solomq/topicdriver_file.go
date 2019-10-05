@@ -25,9 +25,9 @@ func (p *TopicDriver) OpenFile(topicID solomqapitypes.TopicID, path string) (sol
 	}
 
 	dirPath = filepath.Dir(path)
-	p.solomq.posixFS.SimpleMkdirAll(0777, dirPath, 0, 0)
+	p.solomq.posixFs.SimpleMkdirAll(0777, dirPath, 0, 0)
 
-	fsINodeMeta, err = p.solomq.posixFS.SimpleOpenFile(path,
+	fsINodeMeta, err = p.solomq.posixFs.SimpleOpenFile(path,
 		p.defaultNetBlockCap, p.defaultNetBlockCap)
 	if err != nil {
 		log.Error("open file failed", path, err)
@@ -39,7 +39,7 @@ func (p *TopicDriver) OpenFile(topicID solomqapitypes.TopicID, path string) (sol
 		return 0, err
 	}
 
-	fdID = p.solomq.posixFS.FdTableAllocFd(fsINodeMeta.Ino)
+	fdID = p.solomq.posixFs.FdTableAllocFd(fsINodeMeta.Ino)
 
 	return fdID, err
 }
@@ -91,7 +91,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 	policy.SetType(solofsapitypes.BlockPlacementPolicySolomq)
 	NetINodeBlockPlacementPolicySetTopicID(&policy, pTopic.ID)
 
-	err = p.solomq.posixFS.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)
+	err = p.solomq.posixFs.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)
 	if err != nil {
 		return err
 	}

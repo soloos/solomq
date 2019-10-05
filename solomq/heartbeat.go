@@ -22,7 +22,7 @@ func (p *Solomq) doHeartBeat(options snettypes.HeartBeatServerOptions) {
 		err       error
 	)
 
-	heartBeat.SRPCPeerID = p.srpcPeer.PeerID().Str()
+	heartBeat.SrpcPeerID = p.srpcPeer.PeerID().Str()
 	heartBeat.WebPeerID = p.webPeer.PeerID().Str()
 
 	for {

@@ -10,10 +10,10 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
+func (p *SrpcServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	var (
 		reqParamData     = make([]byte, serviceReq.ParamSize)
-		reqParam         solomqprotocol.TopicPWriteRequest
+		reqParam         solomqprotocol.TopicPWriteReq
 		syncDataBackends snettypes.PeerGroup
 		peerID           snettypes.PeerID
 		uNetBlock        solofsapitypes.NetBlockUintptr
@@ -41,8 +41,8 @@ func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	)
 	copy(netINodeID[:], reqParam.NetINodeID())
 
-	uNetINode, err = p.solomq.posixFS.GetNetINode(netINodeID)
-	defer p.solomq.posixFS.ReleaseNetINode(uNetINode)
+	uNetINode, err = p.solomq.posixFs.GetNetINode(netINodeID)
+	defer p.solomq.posixFs.ReleaseNetINode(uNetINode)
 	if err != nil {
 		if err == solofsapitypes.ErrObjectNotExists {
 			solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_404)
@@ -65,8 +65,8 @@ func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	firstNetBlockIndex = int32(reqParam.Offset() / uint64(uNetINode.Ptr().NetBlockCap))
 	lastNetBlockIndex = int32((reqParam.Offset() + uint64(reqParam.Length())) / uint64(uNetINode.Ptr().NetBlockCap))
 	for netBlockIndex = firstNetBlockIndex; netBlockIndex <= lastNetBlockIndex; netBlockIndex++ {
-		uNetBlock, err = p.solomq.posixFS.MustGetNetBlock(uNetINode, netBlockIndex)
-		defer p.solomq.posixFS.ReleaseNetBlock(uNetBlock)
+		uNetBlock, err = p.solomq.posixFs.MustGetNetBlock(uNetINode, netBlockIndex)
+		defer p.solomq.posixFs.ReleaseNetBlock(uNetBlock)
 		if err != nil {
 			solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_502)
 			goto SERVICE_DONE
@@ -78,7 +78,7 @@ func (p *SRPCServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	}
 
 	// request file data
-	err = p.solomq.posixFS.NetINodePWriteWithNetQuery(uNetINode, serviceReq,
+	err = p.solomq.posixFs.NetINodePWriteWithNetQuery(uNetINode, serviceReq,
 		int(reqParam.Length()), reqParam.Offset())
 	if err != nil {
 		return err
