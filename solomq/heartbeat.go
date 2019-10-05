@@ -16,7 +16,7 @@ func (p *Solomq) SetHeartBeatServers(heartBeatServerOptionsArr []snettypes.Heart
 func (p *Solomq) doHeartBeat(options snettypes.HeartBeatServerOptions) {
 	var (
 		heartBeat solomqapitypes.SolomqHeartBeat
-		webret    iron.ApiOutputResult
+		webret    iron.ResponseJSON
 		peer      snettypes.Peer
 		urlPath   string
 		err       error

@@ -1,19 +1,17 @@
 package solomq
 
 import (
-	"soloos/common/solodbapitypes"
-	"soloos/common/solofsapi"
-	"soloos/common/solofsapitypes"
 	"soloos/common/snettypes"
+	"soloos/common/solodbapitypes"
+	"soloos/common/solofsapitypes"
 	"soloos/common/solomqprotocol"
-
-	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-func (p *SrpcServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
+func (p *SrpcServer) ctrTopicPWrite(
+	reqCtx *snettypes.SNetReqContext,
+	req solomqprotocol.TopicPWriteReq,
+) error {
 	var (
-		reqParamData     = make([]byte, serviceReq.ParamSize)
-		reqParam         solomqprotocol.TopicPWriteReq
 		syncDataBackends snettypes.PeerGroup
 		peerID           snettypes.PeerID
 		uNetBlock        solofsapitypes.NetBlockUintptr
@@ -21,55 +19,40 @@ func (p *SrpcServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 		err              error
 	)
 
-	// request param
-	err = serviceReq.ReadAll(reqParamData)
-	if err != nil {
-		return err
-	}
-	reqParam.Init(reqParamData[:serviceReq.ParamSize], flatbuffers.GetUOffsetT(reqParamData[:serviceReq.ParamSize]))
-
 	// response
 
 	// get uNetINode
 	var (
-		protocolBuilder    flatbuffers.Builder
 		netINodeID         solofsapitypes.NetINodeID
 		uNetINode          solofsapitypes.NetINodeUintptr
 		firstNetBlockIndex int32
 		lastNetBlockIndex  int32
 		netBlockIndex      int32
 	)
-	copy(netINodeID[:], reqParam.NetINodeID())
+	netINodeID = req.NetINodeID
 
 	uNetINode, err = p.solomq.posixFs.GetNetINode(netINodeID)
 	defer p.solomq.posixFs.ReleaseNetINode(uNetINode)
 	if err != nil {
-		if err == solofsapitypes.ErrObjectNotExists {
-			solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_404)
-			goto SERVICE_DONE
-		} else {
-			solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_502)
-			goto SERVICE_DONE
-		}
+		return err
 	}
 
 	// TODO no need prepare syncDataBackends every pwrite
 	syncDataBackends.Reset()
 	syncDataBackends.Append(p.solomq.localFsSNetPeer.ID)
-	for i = 0; i < reqParam.TransferBackendsLength(); i++ {
-		copy(peerID[:], reqParam.TransferBackends(i))
+	for i, _ = range req.TransferBackends {
+		peerID.SetStr(req.TransferBackends[i])
 		syncDataBackends.Append(peerID)
 	}
 
 	// prepare uNetBlock
-	firstNetBlockIndex = int32(reqParam.Offset() / uint64(uNetINode.Ptr().NetBlockCap))
-	lastNetBlockIndex = int32((reqParam.Offset() + uint64(reqParam.Length())) / uint64(uNetINode.Ptr().NetBlockCap))
+	firstNetBlockIndex = int32(req.Offset / uint64(uNetINode.Ptr().NetBlockCap))
+	lastNetBlockIndex = int32((req.Offset + uint64(req.Length)) / uint64(uNetINode.Ptr().NetBlockCap))
 	for netBlockIndex = firstNetBlockIndex; netBlockIndex <= lastNetBlockIndex; netBlockIndex++ {
 		uNetBlock, err = p.solomq.posixFs.MustGetNetBlock(uNetINode, netBlockIndex)
 		defer p.solomq.posixFs.ReleaseNetBlock(uNetBlock)
 		if err != nil {
-			solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_502)
-			goto SERVICE_DONE
+			return err
 		}
 
 		if uNetBlock.Ptr().IsSyncDataBackendsInited.Load() == solodbapitypes.MetaDataStateUninited {
@@ -78,23 +61,8 @@ func (p *SrpcServer) ctrTopicPWrite(serviceReq *snettypes.NetQuery) error {
 	}
 
 	// request file data
-	err = p.solomq.posixFs.NetINodePWriteWithNetQuery(uNetINode, serviceReq,
-		int(reqParam.Length()), reqParam.Offset())
-	if err != nil {
-		return err
-	}
-
-SERVICE_DONE:
-	if err != nil {
-		return nil
-	}
-
-	if err == nil {
-		solofsapi.SetCommonResponseCode(&protocolBuilder, snettypes.CODE_OK)
-	}
-
-	respBody := protocolBuilder.Bytes[protocolBuilder.Head():]
-	err = serviceReq.SimpleResponse(serviceReq.ReqID, respBody)
+	err = p.solomq.posixFs.NetINodePWriteWithNetQuery(uNetINode, &reqCtx.NetQuery,
+		int(req.Length), req.Offset)
 	if err != nil {
 		return err
 	}
