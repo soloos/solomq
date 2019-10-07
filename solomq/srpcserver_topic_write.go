@@ -2,8 +2,8 @@ package solomq
 
 import (
 	"soloos/common/snet"
-	"soloos/common/solodbapitypes"
-	"soloos/common/solofsapitypes"
+	"soloos/common/solodbtypes"
+	"soloos/common/solofstypes"
 	"soloos/common/solomqprotocol"
 )
 
@@ -14,7 +14,7 @@ func (p *SrpcServer) ctrTopicPWrite(
 	var (
 		syncDataBackends snet.PeerGroup
 		peerID           snet.PeerID
-		uNetBlock        solofsapitypes.NetBlockUintptr
+		uNetBlock        solofstypes.NetBlockUintptr
 		i                int
 		err              error
 	)
@@ -23,8 +23,8 @@ func (p *SrpcServer) ctrTopicPWrite(
 
 	// get uNetINode
 	var (
-		netINodeID         solofsapitypes.NetINodeID
-		uNetINode          solofsapitypes.NetINodeUintptr
+		netINodeID         solofstypes.NetINodeID
+		uNetINode          solofstypes.NetINodeUintptr
 		firstNetBlockIndex int32
 		lastNetBlockIndex  int32
 		netBlockIndex      int32
@@ -55,7 +55,7 @@ func (p *SrpcServer) ctrTopicPWrite(
 			return err
 		}
 
-		if uNetBlock.Ptr().IsSyncDataBackendsInited.Load() == solodbapitypes.MetaDataStateUninited {
+		if uNetBlock.Ptr().IsSyncDataBackendsInited.Load() == solodbtypes.MetaDataStateUninited {
 			p.solomq.PrepareNetBlockSyncDataBackends(uNetBlock, syncDataBackends)
 		}
 	}

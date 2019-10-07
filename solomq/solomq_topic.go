@@ -1,22 +1,22 @@
 package solomq
 
 import (
-	"soloos/common/solofsapitypes"
-	"soloos/common/solomqapitypes"
+	"soloos/common/solofstypes"
+	"soloos/common/solomqtypes"
 )
 
-func (p *Solomq) OpenTopicFile(topicID solomqapitypes.TopicID, path string) (solofsapitypes.FsINodeFileHandlerID, error) {
+func (p *Solomq) OpenTopicFile(topicID solomqtypes.TopicID, path string) (solofstypes.FsINodeFileHandlerID, error) {
 	return p.TopicDriver.OpenFile(topicID, path)
 }
 
-func (p *Solomq) PrepareNetBlockMetaData(topicID solomqapitypes.TopicID,
-	uNetBlock solofsapitypes.NetBlockUintptr,
-	uNetINode solofsapitypes.NetINodeUintptr, netblockIndex int32) error {
+func (p *Solomq) PrepareNetBlockMetaData(topicID solomqtypes.TopicID,
+	uNetBlock solofstypes.NetBlockUintptr,
+	uNetINode solofstypes.NetINodeUintptr, netblockIndex int32) error {
 	return p.TopicDriver.PrepareNetBlockMetaData(topicID,
 		uNetBlock, uNetINode, netblockIndex)
 }
 
-func (p *Solomq) UploadMemBlockWithSolomq(uJob solofsapitypes.UploadMemBlockJobUintptr,
+func (p *Solomq) UploadMemBlockWithSolomq(uJob solofstypes.UploadMemBlockJobUintptr,
 	uploadPeerIndex int) error {
 	return p.TopicDriver.UploadMemBlockWithSolomq(uJob, uploadPeerIndex)
 }

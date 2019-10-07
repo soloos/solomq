@@ -1,12 +1,12 @@
 package solomqtypes
 
 import (
-	"soloos/common/solodbapitypes"
+	"soloos/common/solodbtypes"
 )
 
-type MetaDataState = solodbapitypes.MetaDataState
+type MetaDataState = solodbtypes.MetaDataState
 
 const (
-	MetaDataStateUninited = solodbapitypes.MetaDataStateUninited
-	MetaDataStateInited   = solodbapitypes.MetaDataStateInited
+	MetaDataStateUninited = solodbtypes.MetaDataStateUninited
+	MetaDataStateInited   = solodbtypes.MetaDataStateInited
 )

@@ -1,10 +1,10 @@
 package solomq
 
 import (
-	"soloos/common/solofsapitypes"
+	"soloos/common/solofstypes"
 )
 
-func (p *TopicDriver) UploadMemBlockWithSolomq(uJob solofsapitypes.UploadMemBlockJobUintptr,
+func (p *TopicDriver) UploadMemBlockWithSolomq(uJob solofstypes.UploadMemBlockJobUintptr,
 	uploadPeerIndex int) error {
 	var topicID = NetINodeBlockPlacementPolicyGetTopicID(
 		&uJob.Ptr().UNetINode.Ptr().MemBlockPlacementPolicy)
@@ -17,7 +17,7 @@ func (p *TopicDriver) UploadMemBlockWithSolomq(uJob solofsapitypes.UploadMemBloc
 	return p.solomq.solomqClient.UploadMemBlockWithSolomq(uTopic, uJob, uploadPeerIndex)
 }
 
-func (p *TopicDriver) UploadMemBlockWithDisk(uJob solofsapitypes.UploadMemBlockJobUintptr,
+func (p *TopicDriver) UploadMemBlockWithDisk(uJob solofstypes.UploadMemBlockJobUintptr,
 	uploadPeerIndex int,
 ) error {
 	return nil

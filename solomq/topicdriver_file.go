@@ -4,15 +4,15 @@ import (
 	"path/filepath"
 	"soloos/common/log"
 	"soloos/common/snet"
-	"soloos/common/solofsapitypes"
-	"soloos/common/solomqapitypes"
+	"soloos/common/solofstypes"
+	"soloos/common/solomqtypes"
 )
 
-func (p *TopicDriver) OpenFile(topicID solomqapitypes.TopicID, path string) (solofsapitypes.FsINodeFileHandlerID, error) {
+func (p *TopicDriver) OpenFile(topicID solomqtypes.TopicID, path string) (solofstypes.FsINodeFileHandlerID, error) {
 	var (
-		uTopic      solomqapitypes.TopicUintptr
-		fsINodeMeta solofsapitypes.FsINodeMeta
-		fdID        solofsapitypes.FsINodeFileHandlerID
+		uTopic      solomqtypes.TopicUintptr
+		fsINodeMeta solofstypes.FsINodeMeta
+		fdID        solofstypes.FsINodeFileHandlerID
 		dirPath     string
 		err         error
 	)
@@ -45,11 +45,11 @@ func (p *TopicDriver) OpenFile(topicID solomqapitypes.TopicID, path string) (sol
 }
 
 func (p *TopicDriver) PrepareTopicMetaData(
-	uTopic solomqapitypes.TopicUintptr,
-	pFsINodeMeta *solofsapitypes.FsINodeMeta,
+	uTopic solomqtypes.TopicUintptr,
+	pFsINodeMeta *solofstypes.FsINodeMeta,
 ) error {
 	var (
-		policy solofsapitypes.MemBlockPlacementPolicy
+		policy solofstypes.MemBlockPlacementPolicy
 		pTopic = uTopic.Ptr()
 		jobNum int
 		jobRet chan error
@@ -68,7 +68,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 
 	for i, _ = range pTopic.Meta.SolomqMemberGroup.Slice() {
 		go func(jobRet chan error, index int,
-			peerID snet.PeerID, uTopic solomqapitypes.TopicUintptr, fsINodeID solofsapitypes.FsINodeID) {
+			peerID snet.PeerID, uTopic solomqtypes.TopicUintptr, fsINodeID solofstypes.FsINodeID) {
 			jobRet <- p.solomq.PrepareTopicMetaDataToNet(
 				uTopic.Ptr().Meta.SolomqMemberGroup.Arr[index].PeerID,
 				uTopic, fsINodeID)
@@ -88,7 +88,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 		return err
 	}
 
-	policy.SetType(solofsapitypes.BlockPlacementPolicySolomq)
+	policy.SetType(solofstypes.BlockPlacementPolicySolomq)
 	NetINodeBlockPlacementPolicySetTopicID(&policy, pTopic.ID)
 
 	err = p.solomq.posixFs.SetNetINodeBlockPlacement(pFsINodeMeta.NetINodeID, policy)

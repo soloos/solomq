@@ -3,15 +3,15 @@ package solomq
 import (
 	"soloos/common/log"
 	"soloos/common/snet"
-	"soloos/common/solofsapitypes"
-	"soloos/common/solomqapitypes"
+	"soloos/common/solofstypes"
 	"soloos/common/solomqprotocol"
+	"soloos/common/solomqtypes"
 	"time"
 )
 
 func (p *TopicDriver) PrepareTopicMetaDataToNet(peerID snet.PeerID,
-	uTopic solomqapitypes.TopicUintptr,
-	fsINodeID solofsapitypes.FsINodeID,
+	uTopic solomqtypes.TopicUintptr,
+	fsINodeID solofstypes.FsINodeID,
 ) error {
 	var (
 		req    solomqprotocol.TopicPrepareReq

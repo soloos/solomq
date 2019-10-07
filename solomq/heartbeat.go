@@ -4,7 +4,7 @@ import (
 	"soloos/common/iron"
 	"soloos/common/log"
 	"soloos/common/snet"
-	"soloos/common/solomqapitypes"
+	"soloos/common/solomqtypes"
 	"time"
 )
 
@@ -15,7 +15,7 @@ func (p *Solomq) SetHeartBeatServers(heartBeatServerOptionsArr []snet.HeartBeatS
 
 func (p *Solomq) doHeartBeat(options snet.HeartBeatServerOptions) {
 	var (
-		heartBeat solomqapitypes.SolomqHeartBeat
+		heartBeat solomqtypes.SolomqHeartBeat
 		webret    iron.ResponseJSON
 		peer      snet.Peer
 		urlPath   string

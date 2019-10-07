@@ -8,7 +8,7 @@ import (
 	"soloos/common/solodbapi"
 	"soloos/common/solofsapi"
 	"soloos/common/solomqapi"
-	"soloos/common/solomqapitypes"
+	"soloos/common/solomqtypes"
 	"soloos/common/soloosbase"
 	"time"
 )
@@ -52,7 +52,7 @@ func (p *Solomq) initSNetPeer(peerID snet.PeerID, srpcListenAddr string) error {
 
 	p.srpcPeer.ID = peerID
 	p.srpcPeer.SetAddress(srpcListenAddr)
-	p.srpcPeer.ServiceProtocol = solomqapitypes.DefaultSolomqRPCProtocol
+	p.srpcPeer.ServiceProtocol = solomqtypes.DefaultSolomqRPCProtocol
 	err = p.SoloosEnv.SNetDriver.RegisterPeer(p.srpcPeer)
 	if err != nil {
 		return err

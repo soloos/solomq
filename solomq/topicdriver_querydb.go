@@ -3,11 +3,11 @@ package solomq
 import (
 	"database/sql"
 	"soloos/common/solodbapi"
-	"soloos/common/solodbapitypes"
-	"soloos/common/solomqapitypes"
+	"soloos/common/solodbtypes"
+	"soloos/common/solomqtypes"
 )
 
-func (p *TopicDriver) InsertTopicInDB(pTopicMeta *solomqapitypes.TopicMeta) error {
+func (p *TopicDriver) InsertTopicInDB(pTopicMeta *solomqtypes.TopicMeta) error {
 	var (
 		sess solodbapi.Session
 		tx   solodbapi.Tx
@@ -61,7 +61,7 @@ QUERY_DONE:
 	return nil
 }
 
-func (p *TopicDriver) FetchTopicByNameFromDB(topicName string, pTopicMeta *solomqapitypes.TopicMeta) error {
+func (p *TopicDriver) FetchTopicByNameFromDB(topicName string, pTopicMeta *solomqtypes.TopicMeta) error {
 	var (
 		sess    solodbapi.Session
 		sqlRows *sql.Rows
@@ -81,7 +81,7 @@ func (p *TopicDriver) FetchTopicByNameFromDB(topicName string, pTopicMeta *solom
 	}
 
 	if sqlRows.Next() == false {
-		err = solodbapitypes.ErrObjectNotExists
+		err = solodbtypes.ErrObjectNotExists
 		goto QUERY_DONE
 	}
 
@@ -103,7 +103,7 @@ QUERY_DONE:
 	return err
 }
 
-func (p *TopicDriver) FetchTopicByIDFromDB(topicID solomqapitypes.TopicID, pTopicMeta *solomqapitypes.TopicMeta) error {
+func (p *TopicDriver) FetchTopicByIDFromDB(topicID solomqtypes.TopicID, pTopicMeta *solomqtypes.TopicMeta) error {
 	var (
 		sess      solodbapi.Session
 		sqlRows   *sql.Rows
@@ -124,7 +124,7 @@ func (p *TopicDriver) FetchTopicByIDFromDB(topicID solomqapitypes.TopicID, pTopi
 	}
 
 	if sqlRows.Next() == false {
-		err = solodbapitypes.ErrObjectNotExists
+		err = solodbtypes.ErrObjectNotExists
 		goto QUERY_DONE
 	}
 
@@ -148,11 +148,11 @@ QUERY_DONE:
 
 func (p *TopicDriver) fetchTopicMembersFromDB(
 	sess *solodbapi.Session,
-	pTopicMeta *solomqapitypes.TopicMeta,
+	pTopicMeta *solomqtypes.TopicMeta,
 ) error {
 	var (
 		sqlRows      *sql.Rows
-		solomqMember solomqapitypes.SolomqMember
+		solomqMember solomqtypes.SolomqMember
 		peerIDStr    string
 		err          error
 	)

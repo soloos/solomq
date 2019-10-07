@@ -3,7 +3,7 @@ package solomqsdk
 import (
 	"soloos/common/snet"
 	"soloos/common/solomqapi"
-	"soloos/common/solomqapitypes"
+	"soloos/common/solomqtypes"
 	"soloos/common/soloosbase"
 	"soloos/solomq/solomq"
 )
@@ -48,7 +48,7 @@ func (p *ClientDriver) Init(soloosEnv *soloosbase.SoloosEnv,
 }
 
 func (p *ClientDriver) InitClient(itClient solomqapi.Client,
-	topicIDStr string, solomqMembers []solomqapitypes.SolomqMember,
+	topicIDStr string, solomqMembers []solomqtypes.SolomqMember,
 ) error {
 
 	var err error

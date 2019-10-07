@@ -2,11 +2,11 @@ package solomq
 
 import (
 	"soloos/common/snet"
-	"soloos/common/solodbapitypes"
-	"soloos/common/solofsapitypes"
+	"soloos/common/solodbtypes"
+	"soloos/common/solofstypes"
 )
 
-func (p *Solomq) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofsapitypes.NetBlockUintptr,
+func (p *Solomq) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofstypes.NetBlockUintptr,
 	backends snet.PeerGroup,
 ) error {
 	var (
@@ -15,7 +15,7 @@ func (p *Solomq) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofsapi
 	)
 
 	pNetBlock.IsSyncDataBackendsInited.LockContext()
-	if pNetBlock.IsSyncDataBackendsInited.Load() == solodbapitypes.MetaDataStateInited {
+	if pNetBlock.IsSyncDataBackendsInited.Load() == solodbtypes.MetaDataStateInited {
 		goto PREPARE_DONE
 	}
 
@@ -24,14 +24,14 @@ func (p *Solomq) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofsapi
 	for i, _ := range backends.Slice() {
 		pNetBlock.SyncDataBackends.Append(backends.Arr[i], 0)
 	}
-	pNetBlock.IsSyncDataBackendsInited.Store(solodbapitypes.MetaDataStateInited)
+	pNetBlock.IsSyncDataBackendsInited.Store(solodbtypes.MetaDataStateInited)
 
 PREPARE_DONE:
 	pNetBlock.IsSyncDataBackendsInited.UnlockContext()
 	return err
 }
 
-func (p *Solomq) PrepareNetBlockSyncDataBackends(uNetBlock solofsapitypes.NetBlockUintptr,
+func (p *Solomq) PrepareNetBlockSyncDataBackends(uNetBlock solofstypes.NetBlockUintptr,
 	syncDataBackends snet.PeerGroup) error {
 	return p.doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock, syncDataBackends)
 }
