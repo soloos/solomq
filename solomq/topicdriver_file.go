@@ -3,7 +3,7 @@ package solomq
 import (
 	"path/filepath"
 	"soloos/common/log"
-	"soloos/common/snettypes"
+	"soloos/common/snet"
 	"soloos/common/solofsapitypes"
 	"soloos/common/solomqapitypes"
 )
@@ -68,7 +68,7 @@ func (p *TopicDriver) PrepareTopicMetaData(
 
 	for i, _ = range pTopic.Meta.SolomqMemberGroup.Slice() {
 		go func(jobRet chan error, index int,
-			peerID snettypes.PeerID, uTopic solomqapitypes.TopicUintptr, fsINodeID solofsapitypes.FsINodeID) {
+			peerID snet.PeerID, uTopic solomqapitypes.TopicUintptr, fsINodeID solofsapitypes.FsINodeID) {
 			jobRet <- p.solomq.solomqClient.PrepareTopicMetaData(
 				uTopic.Ptr().Meta.SolomqMemberGroup.Arr[index].PeerID,
 				uTopic, fsINodeID)

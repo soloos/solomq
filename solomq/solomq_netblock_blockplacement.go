@@ -1,13 +1,13 @@
 package solomq
 
 import (
-	"soloos/common/snettypes"
+	"soloos/common/snet"
 	"soloos/common/solodbapitypes"
 	"soloos/common/solofsapitypes"
 )
 
 func (p *Solomq) doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock solofsapitypes.NetBlockUintptr,
-	backends snettypes.PeerGroup,
+	backends snet.PeerGroup,
 ) error {
 	var (
 		pNetBlock = uNetBlock.Ptr()
@@ -32,6 +32,6 @@ PREPARE_DONE:
 }
 
 func (p *Solomq) PrepareNetBlockSyncDataBackends(uNetBlock solofsapitypes.NetBlockUintptr,
-	syncDataBackends snettypes.PeerGroup) error {
+	syncDataBackends snet.PeerGroup) error {
 	return p.doPrepareNetBlockSyncDataBackendsWithFanout(uNetBlock, syncDataBackends)
 }

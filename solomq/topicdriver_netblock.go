@@ -1,7 +1,7 @@
 package solomq
 
 import (
-	"soloos/common/snettypes"
+	"soloos/common/snet"
 	"soloos/common/solofsapitypes"
 	"soloos/common/solomqapitypes"
 	"unsafe"
@@ -33,7 +33,7 @@ func (p *TopicDriver) prepareNetBlockMetaDataWithRoleLeader(uTopic solomqapitype
 	)
 
 	for _, solomqMember := range pTopic.Meta.SolomqMemberGroup.Slice() {
-		go func(peerID snettypes.PeerID, uTopic solomqapitypes.TopicUintptr, queryNetRetArr chan error) {
+		go func(peerID snet.PeerID, uTopic solomqapitypes.TopicUintptr, queryNetRetArr chan error) {
 			queryNetRetArr <- p.solomq.solomqClient.PrepareTopicNetBlockMetaData(peerID,
 				uTopic, uNetBlock, uNetINode, netblockIndex)
 		}(solomqMember.PeerID, uTopic, queryNetRetArr)

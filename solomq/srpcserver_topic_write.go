@@ -1,19 +1,19 @@
 package solomq
 
 import (
-	"soloos/common/snettypes"
+	"soloos/common/snet"
 	"soloos/common/solodbapitypes"
 	"soloos/common/solofsapitypes"
 	"soloos/common/solomqprotocol"
 )
 
 func (p *SrpcServer) ctrTopicPWrite(
-	reqCtx *snettypes.SNetReqContext,
+	reqCtx *snet.SNetReqContext,
 	req solomqprotocol.TopicPWriteReq,
 ) error {
 	var (
-		syncDataBackends snettypes.PeerGroup
-		peerID           snettypes.PeerID
+		syncDataBackends snet.PeerGroup
+		peerID           snet.PeerID
 		uNetBlock        solofsapitypes.NetBlockUintptr
 		i                int
 		err              error

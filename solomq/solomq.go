@@ -5,7 +5,6 @@ import (
 	"soloos/common/fsapi"
 	"soloos/common/iron"
 	"soloos/common/snet"
-	"soloos/common/snettypes"
 	"soloos/common/solodbapi"
 	"soloos/common/solofsapi"
 	"soloos/common/solomqapi"
@@ -15,8 +14,8 @@ import (
 
 type Solomq struct {
 	*soloosbase.SoloosEnv
-	srpcPeer snettypes.Peer
-	webPeer  snettypes.Peer
+	srpcPeer snet.Peer
+	webPeer  snet.Peer
 	dbConn   solodbapi.Connection
 
 	TopicDriver
@@ -25,9 +24,9 @@ type Solomq struct {
 	solofsClient solofsapi.Client
 	posixFs      fsapi.PosixFs
 
-	localFsSNetPeer snettypes.Peer
+	localFsSNetPeer snet.Peer
 
-	heartBeatServerOptionsArr []snettypes.HeartBeatServerOptions
+	heartBeatServerOptionsArr []snet.HeartBeatServerOptions
 	srpcServer                SrpcServer
 	serverDriver              iron.ServerDriver
 }
@@ -36,7 +35,7 @@ func (p *Solomq) initLocalFs() error {
 	var err error
 	p.localFsSNetPeer.ID = snet.MakeSysPeerID(fmt.Sprintf("Solomq_LOCAL_FS"))
 	p.localFsSNetPeer.SetAddress("LocalFs")
-	p.localFsSNetPeer.ServiceProtocol = snettypes.ProtocolLocalFs
+	p.localFsSNetPeer.ServiceProtocol = snet.ProtocolLocalFs
 	err = p.SNetDriver.RegisterPeer(p.localFsSNetPeer)
 	if err != nil {
 		return err
@@ -44,7 +43,7 @@ func (p *Solomq) initLocalFs() error {
 	return nil
 }
 
-func (p *Solomq) initSNetPeer(peerID snettypes.PeerID, srpcListenAddr string) error {
+func (p *Solomq) initSNetPeer(peerID snet.PeerID, srpcListenAddr string) error {
 	var err error
 
 	p.srpcPeer.ID = peerID
@@ -59,7 +58,7 @@ func (p *Solomq) initSNetPeer(peerID snettypes.PeerID, srpcListenAddr string) er
 }
 
 func (p *Solomq) Init(soloosEnv *soloosbase.SoloosEnv,
-	srpcPeerID snettypes.PeerID, srpcListenAddr string,
+	srpcPeerID snet.PeerID, srpcListenAddr string,
 	dbDriver string, dsn string,
 	defaultNetBlockCap int, defaultMemBlockCap int,
 ) error {

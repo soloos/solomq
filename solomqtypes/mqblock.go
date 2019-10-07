@@ -3,7 +3,7 @@ package solomqtypes
 import (
 	"reflect"
 	"soloos/common/log"
-	"soloos/common/snettypes"
+	"soloos/common/snet"
 	"soloos/solodb/offheap"
 	"sync"
 	"unsafe"
@@ -31,7 +31,7 @@ func (p *MqBlock) Contains(offset, end int) bool {
 	return p.AvailMask.Contains(offset, end)
 }
 
-func (p *MqBlock) PWriteWithConn(conn *snettypes.Connection, length int, offset int) (isSuccess bool) {
+func (p *MqBlock) PWriteWithConn(conn *snet.Connection, length int, offset int) (isSuccess bool) {
 	_, isSuccess = p.AvailMask.MergeIncludeNeighbour(offset, offset+length)
 	if isSuccess {
 		var err error
@@ -56,7 +56,7 @@ func (p *MqBlock) PWriteWithMem(data []byte, offset int) (isSuccess bool) {
 	return
 }
 
-func (p *MqBlock) PReadWithConn(conn *snettypes.Connection, length int, offset int) error {
+func (p *MqBlock) PReadWithConn(conn *snet.Connection, length int, offset int) error {
 	var err error
 	err = conn.WriteAll((*(*[]byte)(unsafe.Pointer(&p.Bytes)))[offset : offset+length])
 	if err != nil {

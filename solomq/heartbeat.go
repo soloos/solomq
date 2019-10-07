@@ -3,21 +3,21 @@ package solomq
 import (
 	"soloos/common/iron"
 	"soloos/common/log"
-	"soloos/common/snettypes"
+	"soloos/common/snet"
 	"soloos/common/solomqapitypes"
 	"time"
 )
 
-func (p *Solomq) SetHeartBeatServers(heartBeatServerOptionsArr []snettypes.HeartBeatServerOptions) error {
+func (p *Solomq) SetHeartBeatServers(heartBeatServerOptionsArr []snet.HeartBeatServerOptions) error {
 	p.heartBeatServerOptionsArr = heartBeatServerOptionsArr
 	return nil
 }
 
-func (p *Solomq) doHeartBeat(options snettypes.HeartBeatServerOptions) {
+func (p *Solomq) doHeartBeat(options snet.HeartBeatServerOptions) {
 	var (
 		heartBeat solomqapitypes.SolomqHeartBeat
 		webret    iron.ResponseJSON
-		peer      snettypes.Peer
+		peer      snet.Peer
 		urlPath   string
 		err       error
 	)

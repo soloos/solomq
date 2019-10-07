@@ -1,7 +1,7 @@
 package solomqsdk
 
 import (
-	"soloos/common/snettypes"
+	"soloos/common/snet"
 	"soloos/common/solomqapi"
 	"soloos/common/solomqapitypes"
 	"soloos/common/soloosbase"
@@ -25,7 +25,7 @@ func (p *ClientDriver) Init(soloosEnv *soloosbase.SoloosEnv,
 
 	p.SoloosEnv = soloosEnv
 
-	var solomqSrpcPeerID snettypes.PeerID
+	var solomqSrpcPeerID snet.PeerID
 	copy(solomqSrpcPeerID[:], []byte(solomqSrpcPeerIDStr))
 	err = p.solomq.Init(p.SoloosEnv,
 		solomqSrpcPeerID, solomqSrpcServeAddr,
@@ -36,10 +36,10 @@ func (p *ClientDriver) Init(soloosEnv *soloosbase.SoloosEnv,
 		return err
 	}
 
-	var heartBeatServer snettypes.HeartBeatServerOptions
-	heartBeatServer.PeerID = snettypes.StrToPeerID(soloBoatWebPeerID)
+	var heartBeatServer snet.HeartBeatServerOptions
+	heartBeatServer.PeerID = snet.StrToPeerID(soloBoatWebPeerID)
 	heartBeatServer.DurationMS = DefaultHeartBeatDurationMS
-	err = p.solomq.SetHeartBeatServers([]snettypes.HeartBeatServerOptions{heartBeatServer})
+	err = p.solomq.SetHeartBeatServers([]snet.HeartBeatServerOptions{heartBeatServer})
 	if err != nil {
 		return err
 	}
