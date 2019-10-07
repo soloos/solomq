@@ -2,14 +2,13 @@ package solomq
 
 import (
 	"fmt"
-	"soloos/common/fsapi"
 	"soloos/common/iron"
 	"soloos/common/snet"
 	"soloos/common/solodbapi"
-	"soloos/common/solofsapi"
 	"soloos/common/solomqapi"
 	"soloos/common/solomqtypes"
 	"soloos/common/soloosbase"
+	"soloos/solofs/solofssdk"
 	"time"
 )
 
@@ -20,10 +19,9 @@ type Solomq struct {
 	dbConn   solodbapi.Connection
 
 	TopicDriver
-	solomqClient solomqapi.SolomqClient
 
-	solofsClient solofsapi.Client
-	posixFs      fsapi.PosixFs
+	solomqClient solomqapi.SolomqClient
+	solofsClient *solofssdk.Client
 
 	localFsSNetPeer snet.Peer
 

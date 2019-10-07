@@ -1,13 +1,12 @@
 package solomq
 
-import "soloos/common/solofsapi"
+import "soloos/solofs/solofssdk"
 
-func (p *Solomq) SetSolofsClient(solofsClient solofsapi.Client) error {
-	p.solofsClient = solofsClient
-	p.posixFs = p.solofsClient.GetPosixFs()
+func (p *Solomq) SetSolofsClient(solofsClient interface{}) error {
+	p.solofsClient = solofsClient.(*solofssdk.Client)
 
-	p.posixFs.NetBlockSetPReadMemBlockWithDisk(p.TopicDriver.PReadMemBlockWithDisk)
-	p.posixFs.NetBlockSetUploadMemBlockWithDisk(p.TopicDriver.UploadMemBlockWithDisk)
+	p.solofsClient.NetBlockSetPReadMemBlockWithDisk(p.TopicDriver.PReadMemBlockWithDisk)
+	p.solofsClient.NetBlockSetUploadMemBlockWithDisk(p.TopicDriver.UploadMemBlockWithDisk)
 
 	return nil
 }

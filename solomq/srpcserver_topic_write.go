@@ -31,8 +31,8 @@ func (p *SrpcServer) ctrTopicPWrite(
 	)
 	netINodeID = req.NetINodeID
 
-	uNetINode, err = p.solomq.posixFs.GetNetINode(netINodeID)
-	defer p.solomq.posixFs.ReleaseNetINode(uNetINode)
+	uNetINode, err = p.solomq.solofsClient.GetNetINode(netINodeID)
+	defer p.solomq.solofsClient.ReleaseNetINode(uNetINode)
 	if err != nil {
 		return err
 	}
@@ -49,8 +49,8 @@ func (p *SrpcServer) ctrTopicPWrite(
 	firstNetBlockIndex = int32(req.Offset / uint64(uNetINode.Ptr().NetBlockCap))
 	lastNetBlockIndex = int32((req.Offset + uint64(req.Length)) / uint64(uNetINode.Ptr().NetBlockCap))
 	for netBlockIndex = firstNetBlockIndex; netBlockIndex <= lastNetBlockIndex; netBlockIndex++ {
-		uNetBlock, err = p.solomq.posixFs.MustGetNetBlock(uNetINode, netBlockIndex)
-		defer p.solomq.posixFs.ReleaseNetBlock(uNetBlock)
+		uNetBlock, err = p.solomq.solofsClient.MustGetNetBlock(uNetINode, netBlockIndex)
+		defer p.solomq.solofsClient.ReleaseNetBlock(uNetBlock)
 		if err != nil {
 			return err
 		}
@@ -61,7 +61,7 @@ func (p *SrpcServer) ctrTopicPWrite(
 	}
 
 	// request file data
-	err = p.solomq.posixFs.NetINodePWriteWithNetQuery(uNetINode, &reqCtx.NetQuery,
+	err = p.solomq.solofsClient.NetINodePWriteWithNetQuery(uNetINode, &reqCtx.NetQuery,
 		int(req.Length), req.Offset)
 	if err != nil {
 		return err

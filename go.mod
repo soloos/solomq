@@ -8,7 +8,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.11.0
 	soloos/common v0.0.0
 	soloos/solodb v0.0.0
-	soloos/solofs v0.0.0 // indirect
+	soloos/solofs v0.0.0
 )
 
 replace (
