@@ -10,6 +10,7 @@ import (
 	"soloos/common/solomqapi"
 	"soloos/common/solomqapitypes"
 	"soloos/common/soloosbase"
+	"time"
 )
 
 type Solomq struct {
@@ -29,6 +30,9 @@ type Solomq struct {
 	heartBeatServerOptionsArr []snet.HeartBeatServerOptions
 	srpcServer                SrpcServer
 	serverDriver              iron.ServerDriver
+
+	normalCallRetryTimes        int
+	waitAliveEveryRetryWaitTime time.Duration
 }
 
 func (p *Solomq) initLocalFs() error {
@@ -110,6 +114,9 @@ func (p *Solomq) Init(soloosEnv *soloosbase.SoloosEnv,
 	if err != nil {
 		return err
 	}
+
+	p.normalCallRetryTimes = 3
+	p.waitAliveEveryRetryWaitTime = time.Second * 3
 
 	return nil
 }
