@@ -11,7 +11,7 @@ import (
 
 func (p *TopicDriver) PrepareTopicMetaDataToNet(peerID snet.PeerID,
 	uTopic solomqtypes.TopicUintptr,
-	fsINodeID solofstypes.FsINodeID,
+	fsINodeIno solofstypes.FsINodeIno,
 ) error {
 	var (
 		req    solomqprotocol.TopicPrepareReq
@@ -20,7 +20,7 @@ func (p *TopicDriver) PrepareTopicMetaDataToNet(peerID snet.PeerID,
 	)
 
 	req.TopicID = pTopic.ID
-	req.FsINodeID = fsINodeID
+	req.FsINodeIno = fsINodeIno
 
 	for i := 0; i < p.solomq.normalCallRetryTimes; i++ {
 		err = p.solomq.solomqClient.SimpleCall(peerID,

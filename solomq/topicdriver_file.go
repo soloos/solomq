@@ -68,10 +68,10 @@ func (p *TopicDriver) PrepareTopicMetaData(
 
 	for i, _ = range pTopic.Meta.SolomqMemberGroup.Slice() {
 		go func(jobRet chan error, index int,
-			peerID snet.PeerID, uTopic solomqtypes.TopicUintptr, fsINodeID solofstypes.FsINodeID) {
+			peerID snet.PeerID, uTopic solomqtypes.TopicUintptr, fsINodeIno solofstypes.FsINodeIno) {
 			jobRet <- p.solomq.PrepareTopicMetaDataToNet(
 				uTopic.Ptr().Meta.SolomqMemberGroup.Arr[index].PeerID,
-				uTopic, fsINodeID)
+				uTopic, fsINodeIno)
 		}(jobRet, i, pTopic.Meta.SolomqMemberGroup.Arr[i].PeerID, uTopic, pFsINodeMeta.Ino)
 	}
 
